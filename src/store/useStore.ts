@@ -64,7 +64,7 @@ export const useStore = create<AppState>()(
       initialReply: '我在呢，请问有什么可以帮您？',
       ttsVoice: 'female',
       videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', // 默认占位视频
-      modelProvider: 'doubao',
+      modelProvider: 'glm',
       apiKey: '3ffbc74e-841a-47e6-b63e-7c77d69e0008',
       customApiUrl: '',
 

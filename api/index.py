@@ -65,8 +65,8 @@ async def chat_endpoint(request: ChatRequest):
             url = url or "https://ark.cn-beijing.volces.com/api/v3/chat/completions"
             model_name = "ep-20250212002344-9p47d"
         elif request.model_provider == "glm":
-            url = url or "https://open.bigmodel.cn/api/paas/v4/chat/completions"
-            model_name = "glm-4"
+            url = url or "https://ark.cn-beijing.volces.com/api/v3/chat/completions"
+            model_name = "glm-4-7-251222"
         elif request.model_provider == "wenxin":
             # 如果文心一言使用 OpenAI 兼容层，则使用这个；如果原生则需要获取 Access Token（此处预留 OpenAI 兼容方式，如千帆 API 的 openai 兼容端点）
             url = url or "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions"
@@ -88,6 +88,15 @@ async def chat_endpoint(request: ChatRequest):
                 {"role": "user", "content": request.message}
             ]
         }
+        
+        # 针对 glm 增加联网搜索工具（如果你提供的 glm 模型端点支持联网的话）
+        if request.model_provider == "glm":
+            payload["tools"] = [
+                {
+                    "type": "web_search",
+                    "max_keyword": 3
+                }
+            ]
         
         # 使用 httpx 进行异步 HTTP 请求，提升并发性能
         async with httpx.AsyncClient(timeout=30.0) as client:
