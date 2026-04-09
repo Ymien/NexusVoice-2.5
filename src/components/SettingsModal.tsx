@@ -18,6 +18,7 @@ const SettingsModal: React.FC = () => {
     modelProvider,
     apiKey,
     customApiUrl,
+    customModelName,
     setSettings
   } = useStore();
 
@@ -77,11 +78,22 @@ const SettingsModal: React.FC = () => {
                     type="text"
                     value={customApiUrl}
                     onChange={(e) => setSettings({ customApiUrl: e.target.value })}
-                    placeholder="例如: https://your-custom-api.com/v1/chat/completions"
+                    placeholder="例如: https://api.openai.com/v1/chat/completions"
+                    className="w-full p-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 focus:ring-2 focus:ring-blue-500 outline-none"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm text-gray-700 dark:text-zinc-300">模型名称 (Model Name)</label>
+                  <input
+                    type="text"
+                    value={customModelName}
+                    onChange={(e) => setSettings({ customModelName: e.target.value })}
+                    placeholder="例如: gpt-3.5-turbo"
                     className="w-full p-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 focus:ring-2 focus:ring-blue-500 outline-none"
                   />
                   <p className="mt-1 text-xs text-gray-500 dark:text-zinc-400">
-                    * 仅当选择“自定义”模型时需要填写完整的端点地址
+                    * 使用自定义模型时，必须填写完整的接口地址和模型标识名称
                   </p>
                 </div>
               </>

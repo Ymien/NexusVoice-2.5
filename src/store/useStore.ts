@@ -27,6 +27,7 @@ interface AppState {
   setModelProvider: (provider: 'glm' | 'deepseek' | 'doubao' | 'custom') => void;
   apiKey: string;            // LLM的API Key
   customApiUrl: string;      // 自定义API地址
+  customModelName: string;   // 自定义模型的名称（例如 gpt-3.5-turbo）
   
   // 运行时的应用状态
   messages: Message[];       // 聊天记录数组
@@ -70,6 +71,7 @@ export const useStore = create<AppState>()(
       setModelProvider: (provider) => set({ modelProvider: provider }),
       apiKey: '', // 前端不再存储默认的 API Key，后端直接使用字典映射
       customApiUrl: '',
+      customModelName: '',
 
       // 默认运行时状态
       messages: [],
@@ -145,6 +147,7 @@ export const useStore = create<AppState>()(
         modelProvider: state.modelProvider,
         apiKey: state.apiKey,
         customApiUrl: state.customApiUrl,
+        customModelName: state.customModelName,
         messages: state.user ? [] : state.messages // 如果已登录，不持久化到本地，从云端拉取
       }),
     }

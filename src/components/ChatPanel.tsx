@@ -46,52 +46,53 @@ const ChatPanel: React.FC = () => {
       return;
     }
 
-    // 取消正在播放的其他语音并恢复引擎
+    // 取消正在播放的其他语音
     window.speechSynthesis.cancel();
-    window.speechSynthesis.resume();
 
-    setPlayingVideo(true);
-    setSpeakingId(id);
+    // 延迟一小段时间再播放，防止 cancel() 误杀新任务
+    setTimeout(() => {
+      setPlayingVideo(true);
+      setSpeakingId(id);
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'zh-CN';
-    utterance.volume = 1;
-    utterance.rate = 1;
-    utterance.pitch = 1;
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'zh-CN';
+      utterance.volume = 1;
+      utterance.rate = 1;
+      utterance.pitch = 1;
 
-    // 尝试根据设置选择男声或女声
-    const voices = window.speechSynthesis.getVoices();
-    const isMale = ttsVoice === 'male';
-    
-    let preferredVoice = voices.find(v =>
-      v.lang.includes('zh') &&
-      (isMale ? (v.name.toLowerCase().includes('male') || v.name.includes('男')) : (v.name.toLowerCase().includes('female') || v.name.includes('女')))
-    );
+      // 尝试根据设置选择男声或女声
+      const voices = window.speechSynthesis.getVoices();
+      const isMale = ttsVoice === 'male';
+      
+      let preferredVoice = voices.find(v =>
+        v.lang.includes('zh') &&
+        (isMale ? (v.name.toLowerCase().includes('male') || v.name.includes('男')) : (v.name.toLowerCase().includes('female') || v.name.includes('女')))
+      );
 
-    if (!preferredVoice) {
-      preferredVoice = voices.find(v => v.lang.includes('zh'));
-    }
+      if (!preferredVoice) {
+        preferredVoice = voices.find(v => v.lang.includes('zh'));
+      }
 
-    if (preferredVoice) {
-      utterance.voice = preferredVoice;
-    }
+      if (preferredVoice) {
+        utterance.voice = preferredVoice;
+      }
 
-    utterance.onend = () => {
-      setSpeakingId(null);
-      setPlayingVideo(false);
-    };
+      utterance.onend = () => {
+        setSpeakingId(null);
+        setPlayingVideo(false);
+      };
 
-    utterance.onerror = (e) => {
-      console.error('SpeechSynthesis error:', e);
-      setSpeakingId(null);
-      setPlayingVideo(false);
-    };
+      utterance.onerror = (e) => {
+        console.error('SpeechSynthesis error:', e);
+        setSpeakingId(null);
+        setPlayingVideo(false);
+      };
 
-    // Chrome/Safari 长文本不发声的黑科技补丁:
-    // 将 utterance 绑定到 window 全局变量，防止被垃圾回收机制意外销毁
-    (window as any)._currentUtterance = utterance;
+      // Chrome/Safari 长文本不发声的黑科技补丁
+      (window as any)._currentUtterance = utterance;
 
-    window.speechSynthesis.speak(utterance);
+      window.speechSynthesis.speak(utterance);
+    }, 50);
   };
 
   return (

@@ -27,6 +27,7 @@ class ChatRequest(BaseModel):
     model_provider: str       # 指定使用的大模型提供商 ('glm', 'deepseek', 'doubao', 'custom')
     api_key: str              # 用于认证的API密钥
     api_url: Optional[str] = "" # 接口地址（对于自定义模型或者特定端点的大模型必须提供）
+    custom_model_name: Optional[str] = "" # 自定义模型名称
 
 class ChatResponse(BaseModel):
     """
@@ -115,7 +116,7 @@ async def chat_endpoint(request: ChatRequest):
         elif request.model_provider == "custom":
             if not url:
                 raise HTTPException(status_code=400, detail="自定义模型必须提供 api_url")
-            model_name = "custom-model"
+            model_name = request.custom_model_name or "gpt-3.5-turbo"
             payload = {
                 "model": model_name,
                 "messages": [

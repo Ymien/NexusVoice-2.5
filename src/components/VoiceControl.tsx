@@ -22,6 +22,7 @@ const VoiceControl: React.FC = () => {
     modelProvider,
     apiKey,
     customApiUrl,
+    customModelName,
     isPlayingVideo,
     setPlayingVideo,
     messages,
@@ -101,50 +102,48 @@ const VoiceControl: React.FC = () => {
   const speakText = (text: string) => {
     if (!window.speechSynthesis) return;
 
-    // 清除可能卡住的语音队列，并恢复引擎状态
+    // 清除可能卡住的语音队列
     window.speechSynthesis.cancel();
-    window.speechSynthesis.resume();
 
-    // 播放视频
-    setPlayingVideo(true);
+    setTimeout(() => {
+      // 播放视频
+      setPlayingVideo(true);
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'zh-CN';
-    utterance.volume = 1;
-    utterance.rate = 1;
-    utterance.pitch = 1;
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'zh-CN';
+      utterance.volume = 1;
+      utterance.rate = 1;
+      utterance.pitch = 1;
 
-    // 尝试根据设置选择男声或女声（不同的系统/浏览器支持情况不同）
-    const voices = window.speechSynthesis.getVoices();
-    const isMale = ttsVoice === 'male';
-    
-    let preferredVoice = voices.find(v =>
-      v.lang.includes('zh') &&
-      (isMale ? (v.name.toLowerCase().includes('male') || v.name.includes('男')) : (v.name.toLowerCase().includes('female') || v.name.includes('女')))
-    );
+      // 尝试根据设置选择男声或女声
+      const voices = window.speechSynthesis.getVoices();
+      const isMale = ttsVoice === 'male';
 
-    // 如果没有找到明确的男声/女声，回退到任意一个中文声音
-    if (!preferredVoice) {
-      preferredVoice = voices.find(v => v.lang.includes('zh'));
-    }
+      let preferredVoice = voices.find(v =>
+        v.lang.includes('zh') &&
+        (isMale ? (v.name.toLowerCase().includes('male') || v.name.includes('男')) : (v.name.toLowerCase().includes('female') || v.name.includes('女')))
+      );
 
-    if (preferredVoice) {
-      utterance.voice = preferredVoice;
-    }
+      if (!preferredVoice) {
+        preferredVoice = voices.find(v => v.lang.includes('zh'));
+      }
 
-    utterance.onend = () => {
-      // 播报结束，停止视频
-      setPlayingVideo(false);
-    };
+      if (preferredVoice) {
+        utterance.voice = preferredVoice;
+      }
 
-    utterance.onerror = (e) => {
-      console.error('SpeechSynthesis error:', e);
-      setPlayingVideo(false);
-    };
+      utterance.onend = () => {
+        setPlayingVideo(false);
+      };
 
-    // 确保声音能被触发（解决某些浏览器因为垃圾回收导致不发声的bug）
-    (window as any)._currentUtterance = utterance;
-    window.speechSynthesis.speak(utterance);
+      utterance.onerror = (e) => {
+        console.error('SpeechSynthesis error:', e);
+        setPlayingVideo(false);
+      };
+
+      (window as any)._currentUtterance = utterance;
+      window.speechSynthesis.speak(utterance);
+    }, 50);
   };
 
   /**
@@ -153,15 +152,6 @@ const VoiceControl: React.FC = () => {
    */
   const handleSend = async (message: string = textInput) => {
     if (!message.trim()) return;
-
-    // ----- [黑科技补丁] 解决部分浏览器在异步请求后阻塞语音播报的问题 -----
-    // 如果用户是点击发送按钮触发的（同步状态），先发送一个空语音来激活引擎权限
-    if (window.speechSynthesis) {
-        const prime = new SpeechSynthesisUtterance('');
-        prime.volume = 0;
-        window.speechSynthesis.speak(prime);
-    }
-    // ---------------------------------------------------------------
 
     // 停止当前的语音识别（如果有）
     if (isListening && recognitionRef.current) {
@@ -186,7 +176,8 @@ const VoiceControl: React.FC = () => {
         message: msgText,
         model_provider: modelProvider,
         api_key: modelProvider === 'custom' ? apiKey : '', // 默认模型不再从前端传key，由后端管理
-        api_url: modelProvider === 'custom' ? customApiUrl : ''
+        api_url: modelProvider === 'custom' ? customApiUrl : '',
+        custom_model_name: customModelName
       };
 
       // 调用 Vercel 上的 Python Serverless 接口或本地的 Vite 代理
