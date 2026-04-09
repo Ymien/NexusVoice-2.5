@@ -1,14 +1,17 @@
-# NexusVoice (智能多模态语音系统)
+# NexusVoice
 
-![Version](https://img.shields.io/badge/version-v0.6.50-blue.svg)
+[English](./README_EN.md) | 简体中文
+
+![Version](https://img.shields.io/badge/version-v0.7.0-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Android%20%7C%20Web-success.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
 
 > **NexusVoice** 是一款生产级多模态智能语音交互系统，为您提供类似钢铁侠“贾维斯”的沉浸式桌面仪表盘体验。
 > 它拥有极其丝滑的 React + Vite 前端，连接强大的 Serverless 后端，完美驱动并适配最前沿的大语言模型。
 
 ---
 
-## 🌟 核心特性与功能
+## 🌟 核心特性
 
 ### 🤖 多模型支持与自由拓展
 - **全系国产大模型**：内置支持 GLM-4 (智谱)、DeepSeek、豆包 (Doubao) 等最强国产大模型。
@@ -28,8 +31,11 @@
 
 **不需要配置任何复杂的代码环境！**
 请直接前往本仓库的 [**Releases (发行版)**](https://github.com/Ymien/NexusVoice-2.5/releases) 页面，下载最新的安装包：
-- 💻 **Windows 用户**: 下载 `.exe` 安装程序，一键安装至桌面。
-- 📱 **Android 用户**: 下载 `.apk` 应用程序，安装至手机直接使用。
+
+| 平台 | 架构 | 文件名 |
+|---|---|---|
+| 💻 **Windows** | x64 | `NexusVoice Setup x.x.x.exe` |
+| 📱 **Android** | arm64/x86 | `app-debug.apk` |
 
 ---
 
@@ -37,7 +43,11 @@
 
 如果您希望在本地进行二次开发或将项目部署为网站，请按照以下步骤操作：
 
-### 1. 环境变量配置
+### 1. 环境准备
+- [Node.js](https://nodejs.org/) >= 18
+- [npm](https://www.npmjs.com/) 或 [pnpm](https://pnpm.io/)
+
+### 2. 环境变量配置
 复制项目根目录下的 `.env.example` 并重命名为 `.env.local`：
 ```env
 VITE_GLM_API_KEY=your-glm-key
@@ -45,11 +55,28 @@ VITE_DEEPSEEK_API_KEY=your-deepseek-key
 VITE_DOUBAO_API_KEY=your-doubao-key
 ```
 
-### 2. 启动开发服务器
+### 3. 启动开发服务器
 ```bash
+git clone https://github.com/Ymien/NexusVoice-2.5.git
+cd NexusVoice-2.5
 npm install
 npm run dev
 ```
 
 ---
-*注：有关每个版本的详细更新日志，请查阅 [changelogs](./changelogs) 文件夹内的更新公告。*
+
+## 常见问题 (FAQ)
+
+**Windows 提示软件“未签名”或“阻止运行”？**
+本项目采用完全开源的免费构建流程，未购买昂贵的 Windows 开发者数字签名证书。如果遇到拦截，请点击“更多信息” -> “仍要运行”。
+
+**为什么没有 macOS 版本？**
+目前聚焦于优化 Windows 桌面端和 Android 移动端的体验。未来如果资金允许购买 Apple 开发者账号，将重新考虑支持 macOS 签名发布。
+
+---
+
+## 更新日志
+有关每个版本的详细更新日志，请查阅 [changelogs](./changelogs) 文件夹内的更新公告。
+
+## 许可证
+[MIT License](https://opensource.org/licenses/MIT) © 2026-present Ymien
