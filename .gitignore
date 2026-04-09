@@ -1,0 +1,21 @@
+node_modules
+dist
+.env
+.env.*
+!.env.example
+.DS_Store
+*.log
+coverage
+
+# Backend
+backend/venv/
+backend/__pycache__/
+backend/*.pyc
+
+# C++ Terminal
+cpp_terminal/build/
+cpp_terminal/CMakeCache.txt
+cpp_terminal/CMakeFiles/
+cpp_terminal/Makefile
+cpp_terminal/cmake_install.cmake
+cpp_terminal/terminal_client
