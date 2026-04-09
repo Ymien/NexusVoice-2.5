@@ -13,6 +13,8 @@ jobs:
     runs-on: windows-latest
     permissions:
       contents: write
+      pull-requests: write
+      issues: write
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
@@ -37,8 +39,9 @@ jobs:
           args: --win
 
       - name: Update Windows Release Body
-        run: |
-          gh release edit ${{ github.ref_name }} --notes-file changelogs/CHANGELOG_${{ github.ref_name }}.md
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: changelogs/CHANGELOG_${{ github.ref_name }}.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -47,6 +50,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
+      issues: write
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
@@ -83,7 +88,8 @@ jobs:
           ./gradlew assembleDebug
 
       - name: Upload APK to Release
-        run: |
-          gh release upload ${{ github.ref_name }} android/app/build/outputs/apk/debug/app-debug.apk --clobber
+        uses: softprops/action-gh-release@v1
+        with:
+          files: android/app/build/outputs/apk/debug/app-debug.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
