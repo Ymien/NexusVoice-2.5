@@ -229,51 +229,48 @@ const VoiceControl: React.FC = () => {
   };
 
   return (
-    <div className="w-full flex items-center gap-2 sm:gap-3 p-3 sm:p-4 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl shadow-sm">
-      {/* 录音按钮 */}
+    <div className="w-full flex items-center gap-3 p-3 lg:p-4 bg-transparent rounded-3xl">
+      {/* 录音按钮 (Morphing design) */}
       <button
         onClick={toggleListening}
-        className={`p-3 sm:p-4 rounded-full transition-all duration-300 shadow-md shrink-0 ${
+        className={`relative w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center rounded-2xl sm:rounded-3xl transition-all duration-500 shadow-xl shrink-0 border group ${
           isListening
-            ? 'bg-red-500 text-white animate-pulse shadow-red-500/50'
-            : 'bg-blue-100 text-blue-600 hover:bg-blue-200 dark:bg-zinc-800 dark:text-blue-400'
+            ? 'bg-rose-500 text-white border-rose-400/50 shadow-rose-500/40 animate-pulse'
+            : 'bg-gradient-to-br from-blue-500 to-indigo-600 text-white border-blue-400/50 shadow-blue-500/30 hover:shadow-blue-500/50 hover:-translate-y-1'
         }`}
         title={isListening ? "停止录音" : "开始录音"}
       >
-        {isListening ? <MicOff className="w-5 h-5 sm:w-6 sm:h-6" /> : <Mic className="w-5 h-5 sm:w-6 sm:h-6" />}
+        {isListening ? (
+          <MicOff className="w-6 h-6 sm:w-7 sm:h-7 transition-transform group-hover:scale-110" />
+        ) : (
+          <Mic className="w-6 h-6 sm:w-7 sm:h-7 transition-transform group-hover:scale-110" />
+        )}
       </button>
 
       {/* 文本输入框 */}
-      <input
-        type="text"
-        value={textInput}
-        onChange={(e) => setTextInput(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            handleSend();
-          }
-        }}
-        placeholder="说出唤醒词或手动输入..."
-        className="flex-1 min-w-0 p-2 sm:p-3 text-sm sm:text-base bg-gray-100 dark:bg-zinc-800 border-none rounded-xl text-gray-800 dark:text-zinc-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
-      />
-
-      {/* 发送按钮 */}
-      <button
-        onClick={() => handleSend()}
-        disabled={!textInput.trim()}
-        className="p-2 sm:p-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed text-white rounded-xl shadow-md transition-all shrink-0"
-      >
-        <Send className="w-4 h-4 sm:w-5 sm:h-5" />
-      </button>
-
-      {/* 设置按钮 */}
-      <button
-        onClick={() => setSettingsOpen(true)}
-        className="hidden sm:block p-3 bg-gray-100 hover:bg-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-gray-600 dark:text-zinc-400 rounded-xl transition-all shrink-0"
-        title="系统设置"
-      >
-        <Settings className="w-5 h-5" />
-      </button>
+      <div className="flex-1 relative group h-14 sm:h-16">
+        <input
+          type="text"
+          value={textInput}
+          onChange={(e) => setTextInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handleSend();
+            }
+          }}
+          placeholder="Type or speak a command..."
+          className="w-full h-full pl-5 pr-14 text-[15px] bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/50 rounded-2xl sm:rounded-3xl text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all shadow-inner placeholder-slate-400 dark:placeholder-slate-500"
+        />
+        
+        {/* 内置发送按钮 */}
+        <button
+          onClick={() => handleSend()}
+          disabled={!textInput.trim()}
+          className="absolute right-2 top-2 bottom-2 w-10 sm:w-12 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-300 dark:disabled:bg-slate-700 disabled:text-slate-400 disabled:cursor-not-allowed text-white rounded-xl sm:rounded-2xl flex items-center justify-center transition-all"
+        >
+          <Send className="w-4 h-4 sm:w-5 sm:h-5 ml-1" />
+        </button>
+      </div>
     </div>
   );
 };

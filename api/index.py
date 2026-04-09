@@ -102,6 +102,15 @@ async def chat_endpoint(request: ChatRequest):
                 ],
                 "input": [
                     {
+                        "role": "system",
+                        "content": [
+                            {
+                                "type": "input_text",
+                                "text": "你是一个有用的语音助手。请用简短、口语化的语言回答，因为你的回答将被转换为语音播报。不要回答多余的信息。"
+                            }
+                        ]
+                    },
+                    {
                         "role": "user",
                         "content": [
                             {
@@ -158,6 +167,15 @@ async def chat_endpoint(request: ChatRequest):
                 
             return ChatResponse(reply=reply_text)
             
+    except urllib.error.HTTPError as e:
+        error_body = e.read().decode('utf-8')
+        try:
+            err_json = json.loads(error_body)
+            error_msg = err_json.get("error", {}).get("message", error_body)
+        except:
+            error_msg = error_body
+        print(f"模型API请求失败: HTTP {e.code} - {error_msg}")
+        return ChatResponse(reply="", error=f"模型API请求失败: HTTP {e.code} - {error_msg}")
     except Exception as e:
         print(f"服务器内部错误: {str(e)}")
         # 捕获并返回任何运行时异常，避免后端崩溃

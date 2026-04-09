@@ -81,12 +81,15 @@ const ChatPanel: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-full w-full bg-gray-50 dark:bg-zinc-900 rounded-2xl shadow-inner p-4 overflow-hidden border border-gray-200 dark:border-zinc-800">
-      <div className="flex-1 overflow-y-auto space-y-4 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-zinc-700">
+    <div className="flex flex-col h-full w-full bg-transparent p-4 lg:p-6 overflow-hidden z-10 relative">
+      <div className="flex-1 overflow-y-auto space-y-6 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700 pr-2">
         {messages.length === 0 ? (
           // 当没有聊天记录时显示的占位提示
-          <div className="h-full flex items-center justify-center text-gray-400 dark:text-zinc-500">
-            <p>通过唤醒词或者点击麦克风开始聊天吧</p>
+          <div className="h-full flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 gap-3">
+            <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+              <Volume2 className="w-6 h-6 text-slate-300 dark:text-slate-600" />
+            </div>
+            <p className="text-sm font-medium tracking-wide">等待接收语音指令...</p>
           </div>
         ) : (
           // 遍历并渲染聊天消息
@@ -95,38 +98,38 @@ const ChatPanel: React.FC = () => {
               key={msg.id}
               className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
-              <div className="flex flex-col max-w-[85%] sm:max-w-[80%] group">
+              <div className={`flex flex-col max-w-[85%] lg:max-w-[75%] group ${msg.role === 'user' ? 'items-end' : 'items-start'}`}>
                 <div
-                  className={`rounded-2xl px-4 py-2.5 text-sm shadow-sm ${
+                  className={`rounded-2xl px-5 py-3.5 text-[15px] shadow-sm ${
                     msg.role === 'user'
-                      ? 'bg-blue-600 text-white rounded-br-sm'  // 用户的消息气泡样式
-                      : 'bg-white dark:bg-zinc-800 text-gray-800 dark:text-zinc-200 rounded-bl-sm border border-gray-100 dark:border-zinc-700' // AI消息的气泡样式
+                      ? 'bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-br-sm shadow-blue-500/20'  // 用户的消息气泡样式
+                      : 'bg-white dark:bg-[#1E293B] text-slate-800 dark:text-slate-200 rounded-bl-sm border border-slate-100 dark:border-slate-700/50 shadow-slate-200/50 dark:shadow-none' // AI消息的气泡样式
                   }`}
                 >
                   <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                 </div>
-                
+
                 {/* 针对 AI 消息提供操作按钮：语音播报 */}
                 {msg.role === 'ai' && (
-                  <div className="flex items-center gap-2 mt-1 px-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center gap-2 mt-1.5 px-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                       onClick={() => handleSpeak(msg.id, msg.content)}
-                      className={`flex items-center gap-1 text-xs px-2 py-1 rounded-md transition-colors ${
-                        speakingId === msg.id 
-                          ? 'text-red-500 bg-red-50 dark:bg-red-900/20' 
-                          : 'text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                      className={`flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-md transition-all ${
+                        speakingId === msg.id
+                          ? 'text-rose-500 bg-rose-50 dark:bg-rose-500/10'
+                          : 'text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:text-blue-400 dark:hover:bg-blue-500/10'
                       }`}
                       title={speakingId === msg.id ? "停止播报" : "朗读消息"}
                     >
                       {speakingId === msg.id ? (
                         <>
                           <Square className="w-3 h-3 fill-current" />
-                          <span>停止</span>
+                          <span>停止播报</span>
                         </>
                       ) : (
                         <>
                           <Volume2 className="w-3.5 h-3.5" />
-                          <span>朗读</span>
+                          <span>朗读消息</span>
                         </>
                       )}
                     </button>
