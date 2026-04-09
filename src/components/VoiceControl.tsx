@@ -17,19 +17,21 @@ declare global {
 const VoiceControl: React.FC = () => {
   const {
     wakeWord,
-    initialReply,
-    ttsVoice,
+    voiceType,
     modelProvider,
     apiKey,
     customApiUrl,
-    isListening,
-    setListening,
+    isVideoPlaying,
+    setVideoPlaying,
+    messages,
     addMessage,
-    setPlayingVideo,
+    clearMessages,
+    isSettingsOpen,
     setSettingsOpen
   } = useStore();
 
   const [textInput, setTextInput] = useState('');
+  const [isListening, setListening] = useState(false);
   const recognitionRef = useRef<any>(null);
 
   // 初始化语音识别对象
@@ -78,12 +80,13 @@ const VoiceControl: React.FC = () => {
    */
   const handleWakeUp = () => {
     // 播报初始回复
-    speakText(initialReply);
+    speakText("我在呢，有什么可以帮您？");
     addMessage({
-      id: Date.now().toString(),
-      role: 'ai',
-      content: initialReply
-    });
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: "我在呢，有什么可以帮您？",
+        timestamp: Date.now()
+      });
     // 可以在此处重新启动录音，听取用户后续问题
     setTimeout(() => {
       startListening();
@@ -98,30 +101,30 @@ const VoiceControl: React.FC = () => {
     if (!window.speechSynthesis) return;
 
     // 播放视频
-    setPlayingVideo(true);
+    setVideoPlaying(true);
 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'zh-CN';
-    
+
     // 尝试根据设置选择男声或女声（不同的系统/浏览器支持情况不同）
     const voices = window.speechSynthesis.getVoices();
-    const isMale = ttsVoice === 'male';
-    const preferredVoice = voices.find(v => 
-      v.lang.includes('zh') && 
+    const isMale = voiceType === 'male';
+    const preferredVoice = voices.find(v =>
+      v.lang.includes('zh') &&
       (isMale ? v.name.toLowerCase().includes('male') || v.name.includes('男') : v.name.toLowerCase().includes('female') || v.name.includes('女'))
     );
-    
+
     if (preferredVoice) {
       utterance.voice = preferredVoice;
     }
 
     utterance.onend = () => {
       // 播报结束，停止视频
-      setPlayingVideo(false);
+      setVideoPlaying(false);
     };
 
     utterance.onerror = () => {
-      setPlayingVideo(false);
+      setVideoPlaying(false);
     };
 
     window.speechSynthesis.speak(utterance);
@@ -146,7 +149,8 @@ const VoiceControl: React.FC = () => {
     addMessage({
       id: Date.now().toString(),
       role: 'user',
-      content: msgText
+      content: msgText,
+      timestamp: Date.now()
     });
 
     try {
@@ -177,8 +181,9 @@ const VoiceControl: React.FC = () => {
       // 添加AI消息到聊天面板
       addMessage({
         id: (Date.now() + 1).toString(),
-        role: 'ai',
-        content: data.reply
+        role: 'assistant',
+        content: data.reply,
+        timestamp: Date.now() + 1
       });
 
       // 将AI回复转为语音播报并播放视频
@@ -188,8 +193,9 @@ const VoiceControl: React.FC = () => {
       console.error('发送消息失败:', error);
       addMessage({
         id: (Date.now() + 1).toString(),
-        role: 'ai',
-        content: `抱歉，发生了错误: ${error.message}`
+        role: 'system',
+        content: `抱歉，发生了错误: ${error.message}`,
+        timestamp: Date.now() + 1
       });
     }
   };

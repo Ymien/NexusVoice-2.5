@@ -107,7 +107,7 @@ const ChatPanel: React.FC = () => {
                 </div>
                 
                 {/* 针对 AI 消息提供操作按钮：语音播报 */}
-                {msg.role === 'ai' && (
+                {msg.role === 'assistant' && (
                   <div className="flex items-center gap-2 mt-1 px-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                       onClick={() => handleSpeak(msg.id, msg.content)}
