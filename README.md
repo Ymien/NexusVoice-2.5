@@ -1,4 +1,4 @@
-# NexusVoice
+# NexusVoice (v0.5.50)
 
 NexusVoice 是一款生产级多模态智能语音交互系统，提供类似钢铁侠“贾维斯”的沉浸式桌面仪表盘体验。
 基于 React + Vite 构建的丝滑前端，与基于 FastAPI 和 Serverless 架构的强大后端连接，完美适配多种大语言模型。
@@ -29,4 +29,4 @@ npm run dev
 
 ## 📦 打包为桌面应用与移动端应用
 由于集成了 Electron、Capacitor 与 GitHub Actions，**你完全不需要在本地配置复杂的打包环境**！
-每当代码推送到 GitHub 并打上以 `v` 开头的标签时，GitHub 会**自动**在云端为你打包出 Windows 的 `.exe` 和 Android 的 `.apk` 安装包，并发布在仓库的 **Releases** 页面！
+每当代码推送到 GitHub 并打上以 `v` 开头的标签（例如 `v0.5.50`）时，GitHub 会**自动**在云端为你打包出 Windows 的 `.exe` 和 Android 的 `.apk` 安装包，并发布在仓库的 **Releases** 页面！

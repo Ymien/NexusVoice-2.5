@@ -34,6 +34,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           release: true
           build_script_name: build
+          args: --win
 
   release-android:
     runs-on: ubuntu-latest
