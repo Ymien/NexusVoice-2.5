@@ -9,6 +9,8 @@ jobs:
   release:
     name: build-${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write # 关键修复：赋予 Github Actions 写权限以创建 Release
     strategy:
       matrix:
         os: [windows-latest, macos-latest, ubuntu-latest]

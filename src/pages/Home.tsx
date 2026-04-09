@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import ChatPanel from '../components/ChatPanel';
 import VoiceControl from '../components/VoiceControl';
-import VideoPlayer from '../components/VideoPlayer';
+import WelcomeGreeting from '../components/WelcomeGreeting';
 import SettingsModal from '../components/SettingsModal';
 import AuthModal from '../components/AuthModal';
 import { useStore } from '../store/useStore';
 import { supabase } from '../lib/supabase';
-import { Settings, LogOut, User, Mic2, Sparkles, LayoutDashboard } from 'lucide-react';
+import { Settings, LogOut, User, Sparkles } from 'lucide-react';
 
 export default function Home() {
   const setSettingsOpen = useStore((state) => state.setSettingsOpen);
@@ -14,8 +14,20 @@ export default function Home() {
   const setUser = useStore((state) => state.setUser);
   const messages = useStore((state) => state.messages);
   const clearMessages = useStore((state) => state.clearMessages);
+  const theme = useStore((state) => state.theme);
 
   const [isAuthOpen, setAuthOpen] = useState(false);
+
+  // Apply theme to document element for global CSS
+  useEffect(() => {
+    const root = document.documentElement;
+    root.classList.remove('dark', 'theme-dopamine');
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else if (theme === 'dopamine') {
+      root.classList.add('theme-dopamine');
+    }
+  }, [theme]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -35,9 +47,9 @@ export default function Home() {
   };
 
   return (
-    <div className="h-screen w-full bg-[#F8FAFC] dark:bg-[#0B0F19] text-slate-900 dark:text-slate-100 flex flex-col overflow-hidden font-sans transition-colors duration-300">
+    <div className="h-screen w-full flex flex-col overflow-hidden transition-colors duration-300">
       {/* 顶部导航栏 (Glassmorphism) */}
-      <header className="h-16 shrink-0 bg-white/70 dark:bg-[#111827]/70 backdrop-blur-xl border-b border-slate-200/60 dark:border-slate-800/60 z-20 flex items-center justify-between px-4 lg:px-8">
+      <header className="h-16 shrink-0 bg-[var(--bg-primary)]/70 backdrop-blur-xl border-b border-[var(--border-color)] z-20 flex items-center justify-between px-4 lg:px-8">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 bg-gradient-to-tr from-blue-600 to-violet-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20 shrink-0 border border-white/10">
             <Mic2 className="w-5 h-5 text-white" strokeWidth={2.5} />
@@ -98,24 +110,24 @@ export default function Home() {
         
         {/* 左侧控制与视频面板 (Sidebar) */}
         <aside className="w-full md:w-[360px] lg:w-[420px] xl:w-[480px] shrink-0 flex flex-col gap-4 lg:gap-6 overflow-y-auto md:overflow-visible">
-          {/* 视频监控卡片 */}
-          <div className="w-full aspect-video md:aspect-auto md:flex-1 bg-black rounded-3xl overflow-hidden shadow-2xl shadow-slate-900/10 dark:shadow-black/40 border border-slate-200/50 dark:border-slate-700/50 relative group min-h-[220px]">
-            <div className="absolute top-4 left-4 z-10 flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+          {/* 视频监控卡片 / 欢迎页面 */}
+          <div className="w-full aspect-video md:aspect-auto md:flex-1 rounded-3xl overflow-hidden shadow-2xl border border-[var(--border-color)] relative group min-h-[220px] transition-all duration-500">
+            <div className="absolute top-4 left-4 z-10 flex items-center gap-2 bg-[var(--bg-primary)]/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-[var(--border-color)]">
               <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-              <span className="text-xs font-semibold text-white tracking-wide">LIVE VISUAL</span>
+              <span className="text-xs font-semibold text-[var(--text-primary)] tracking-wide">NEXUS AI</span>
             </div>
-            <VideoPlayer />
+            <WelcomeGreeting />
           </div>
 
           {/* 语音交互控制台 */}
-          <div className="shrink-0 bg-white dark:bg-[#111827] rounded-3xl p-1 shadow-xl shadow-slate-200/50 dark:shadow-black/20 border border-slate-200/60 dark:border-slate-700/60">
+          <div className="shrink-0 bg-[var(--bg-panel)] rounded-3xl p-1 shadow-xl border border-[var(--border-color)]">
             <VoiceControl />
           </div>
         </aside>
 
         {/* 右侧聊天主面板 (Main Content) */}
-        <section className="flex-1 flex flex-col min-w-0 bg-white dark:bg-[#111827] rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-black/20 border border-slate-200/60 dark:border-slate-700/60 overflow-hidden relative">
-          <div className="h-14 shrink-0 border-b border-slate-100 dark:border-slate-800/60 flex items-center justify-between px-6 bg-slate-50/50 dark:bg-[#111827]/50 z-20">
+        <section className="flex-1 flex flex-col min-w-0 bg-[var(--bg-panel)] rounded-3xl shadow-xl border border-[var(--border-color)] overflow-hidden relative">
+          <div className="h-14 shrink-0 border-b border-[var(--border-color)] flex items-center justify-between px-6 bg-[var(--bg-primary)]/50 z-20">
             <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
               <LayoutDashboard className="w-4 h-4" />
               <h2 className="text-sm font-bold tracking-wide">对话流 (Conversation Stream)</h2>

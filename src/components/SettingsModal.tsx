@@ -19,6 +19,7 @@ const SettingsModal: React.FC = () => {
     apiKey,
     customApiUrl,
     customModelName,
+    theme,
     setSettings
   } = useStore();
 
@@ -40,6 +41,26 @@ const SettingsModal: React.FC = () => {
 
         {/* 滚动表单区 */}
         <div className="flex-1 overflow-y-auto pr-2 space-y-5">
+          {/* 界面及主题配置 */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">界面配置</h3>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm text-gray-700 dark:text-zinc-300">系统主题 (Theme)</label>
+              <select
+                value={theme}
+                onChange={(e) => setSettings({ theme: e.target.value as 'light' | 'dark' | 'dopamine' })}
+                className="w-full p-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 focus:ring-2 focus:ring-blue-500 outline-none"
+              >
+                <option value="light">清爽浅色 (Light)</option>
+                <option value="dark">沉浸深色 (Dark)</option>
+                <option value="dopamine">活力多巴胺 (Dopamine)</option>
+              </select>
+            </div>
+          </div>
+
+          <hr className="border-gray-200 dark:border-zinc-800" />
+
           {/* 大模型配置 */}
           <div className="space-y-3">
             <h3 className="text-sm font-semibold text-gray-500 dark:text-zinc-400 uppercase tracking-wider">大模型配置</h3>

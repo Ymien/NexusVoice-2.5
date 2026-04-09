@@ -1,5 +1,13 @@
 # 更新日志 (Changelog)
 
+## [v0.3.75] - 2026-04-09
+### 新增特性 (Features)
+- 🎨 **多主题适配 & 多巴胺配色**: 将原本单一的黑暗/明亮模式重构，加入了全新的“多巴胺 (Dopamine)”主题。引入了 Plus Jakarta Sans 和 Outfit 字体，为桌面仪表盘提供更生动、精美的视觉效果。
+- 🌟 **欢迎语模块重构**: 移除了无用的占位视频组件，取而代之的是全新的 `WelcomeGreeting` 组件。该组件会根据当前系统时间自动切换日夜模式的问候语，并在语音播报时配合绚丽的粒子动画与状态指示器联动。
+- 📦 **GitHub Actions 权限修复**: 彻底修复了 GitHub Actions 在打包 Electron `.exe` 和 `.dmg` 时抛出的 `HTTP 401: Bad credentials` 错误，现在每次打标签推送时都能稳定触发自动打包与发布。
+
+---
+
 ## [v0.3.50] - 2026-04-09
 ### 修复与优化 (Fixes)
 - 🐛 **打包配置修复**: 修复了 Electron 构建依赖包 (`electron`, `electron-builder` 等) 未正确写入 `package.json` 的问题。这确保了 GitHub Actions 能够顺利拉取打包环境并成功生成 `.exe` 和 `.dmg`。

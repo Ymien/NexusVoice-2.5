@@ -19,6 +19,8 @@ interface AppState {
   setUser: (user: any | null) => void;
 
   // 设置相关的状态
+  theme: 'light' | 'dark' | 'dopamine'; // UI 主题
+  setTheme: (theme: 'light' | 'dark' | 'dopamine') => void;
   wakeWord: string;          // 唤醒词，例如 "小艾"
   initialReply: string;      // 唤醒后的首次回复，例如 "我在呢"
   ttsVoice: 'male' | 'female'; // TTS发音人性别
@@ -63,6 +65,8 @@ export const useStore = create<AppState>()(
       },
 
       // 默认设置值
+      theme: 'light',
+      setTheme: (theme) => set({ theme }),
       wakeWord: '小艾',
       initialReply: '我在呢，请问有什么可以帮您？',
       ttsVoice: 'female',
@@ -140,6 +144,7 @@ export const useStore = create<AppState>()(
     {
       name: 'voice-chat-storage', // localStorage 中的键名
       partialize: (state) => ({
+        theme: state.theme,
         wakeWord: state.wakeWord,
         initialReply: state.initialReply,
         ttsVoice: state.ttsVoice,
