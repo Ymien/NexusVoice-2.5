@@ -18,12 +18,12 @@ const VoiceControl: React.FC = () => {
   const {
     wakeWord,
     initialReply,
-    ttsVoice: voiceType,
+    ttsVoice,
     modelProvider,
     apiKey,
     customApiUrl,
     isPlayingVideo,
-    setPlayingVideo: setVideoPlaying,
+    setPlayingVideo,
     messages,
     addMessage,
     clearMessages,
@@ -106,7 +106,7 @@ const VoiceControl: React.FC = () => {
     window.speechSynthesis.resume();
 
     // 播放视频
-    setVideoPlaying(true);
+    setPlayingVideo(true);
 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'zh-CN';
@@ -116,7 +116,7 @@ const VoiceControl: React.FC = () => {
 
     // 尝试根据设置选择男声或女声（不同的系统/浏览器支持情况不同）
     const voices = window.speechSynthesis.getVoices();
-    const isMale = voiceType === 'male';
+    const isMale = ttsVoice === 'male';
     
     let preferredVoice = voices.find(v =>
       v.lang.includes('zh') &&
@@ -134,12 +134,12 @@ const VoiceControl: React.FC = () => {
 
     utterance.onend = () => {
       // 播报结束，停止视频
-      setVideoPlaying(false);
+      setPlayingVideo(false);
     };
 
     utterance.onerror = (e) => {
       console.error('SpeechSynthesis error:', e);
-      setVideoPlaying(false);
+      setPlayingVideo(false);
     };
 
     // 确保声音能被触发（解决某些浏览器因为垃圾回收导致不发声的bug）
