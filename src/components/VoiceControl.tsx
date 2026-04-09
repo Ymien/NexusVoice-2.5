@@ -36,8 +36,17 @@ const VoiceControl: React.FC = () => {
   const [isListening, setListening] = useState(false);
   const recognitionRef = useRef<any>(null);
 
+
   // 初始化语音识别对象
   useEffect(() => {
+    // 强制触发一次 voices 的加载
+    if (window.speechSynthesis) {
+      window.speechSynthesis.getVoices();
+      window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices();
+      };
+    }
+
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
       const recognition = new SpeechRecognition();
@@ -183,31 +192,74 @@ const VoiceControl: React.FC = () => {
                              window.location.hostname === 'localhost';
       const apiUrl = isDesktopOrApp ? 'https://nexusvoice-2-5.vercel.app/api/chat' : '/api/chat';
 
-      // 发起请求
-      const response = await fetch(apiUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(requestData)
-      });
+      let replyText = "";
+      
+      // 如果用户在设置里填写了 API Key，优先走前端直连
+      if (apiKey) {
+        let directUrl = "https://api.deepseek.com/chat/completions";
+        let modelName = "deepseek-chat";
 
-      const data = await response.json();
+        if (modelProvider === 'doubao') {
+          directUrl = "https://ark.cn-beijing.volces.com/api/v3/chat/completions";
+          modelName = "ep-20240521171539-7b9mc"; // 豆包默认接入点示例
+        } else if (modelProvider === 'custom' && customApiUrl) {
+          directUrl = customApiUrl;
+          modelName = customModelName || "default-model";
+        } else if (modelProvider === 'glm') {
+          directUrl = "https://open.bigmodel.cn/api/paas/v4/chat/completions"; 
+          modelName = "glm-4";
+        }
 
-      if (data.error) {
-        throw new Error(data.error);
+        const directResponse = await fetch(directUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+          },
+          body: JSON.stringify({
+            model: modelName,
+            messages: [
+              { role: "system", content: "你是一个贴心的AI助手，请用简短、自然的中文口语回答。" },
+              { role: "user", content: msgText }
+            ]
+          })
+        });
+
+        if (!directResponse.ok) {
+          const errData = await directResponse.json().catch(() => ({}));
+          throw new Error(errData.error?.message || `API 请求失败 (状态码: ${directResponse.status})`);
+        }
+
+        const data = await directResponse.json();
+        replyText = data.choices?.[0]?.message?.content || "抱歉，我没有获取到有效的回复。";
+      } else {
+        // 否则回退到 Vercel 后端
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(requestData)
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+          throw new Error(data.error);
+        }
+        replyText = data.reply;
       }
 
       // 添加AI消息到聊天面板
       addMessage({
         id: (Date.now() + 1).toString(),
         role: 'ai',
-        content: data.reply,
+        content: replyText,
         timestamp: Date.now() + 1
       });
 
       // 将AI回复转为语音播报并播放视频
-      speakText(data.reply);
+      speakText(replyText);
 
     } catch (error: any) {
       console.error('发送消息失败:', error);
