@@ -1,7 +1,7 @@
 {
   "name": "workspace",
   "private": true,
-  "version": "0.5.0",
+  "version": "0.5.25",
   "type": "module",
   "repository": {
     "type": "git",
@@ -35,22 +35,11 @@
       "dist/**/*",
       "electron-main.js"
     ],
-    "mac": {
-      "target": [
-        "dmg"
-      ],
-      "icon": "public/vite.svg"
-    },
     "win": {
       "target": [
         "nsis"
       ],
       "icon": "public/vite.svg"
-    },
-    "linux": {
-      "target": [
-        "AppImage"
-      ]
     }
   },
   "dependencies": {
