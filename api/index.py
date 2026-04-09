@@ -63,8 +63,7 @@ async def chat_endpoint(request: ChatRequest):
             model_name = "deepseek-chat"
         elif request.model_provider == "doubao":
             url = url or "https://ark.cn-beijing.volces.com/api/v3/chat/completions"
-            # 豆包通常需要具体的 endpoint ID，此处假设前端传递或者使用通用的
-            model_name = "doubao-default" 
+            model_name = "ep-20250212002344-9p47d"
         elif request.model_provider == "glm":
             url = url or "https://open.bigmodel.cn/api/paas/v4/chat/completions"
             model_name = "glm-4"
