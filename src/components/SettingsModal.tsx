@@ -47,13 +47,14 @@ const SettingsModal: React.FC = () => {
               <label className="text-sm text-gray-700 dark:text-zinc-300">API 提供商</label>
               <select
                 value={modelProvider}
-                onChange={(e) => setSettings({ modelProvider: e.target.value })}
+                onChange={(e) => setSettings({ modelProvider: e.target.value as any })}
                 className="w-full p-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 focus:ring-2 focus:ring-blue-500 outline-none"
               >
-                <option value="deepseek">DeepSeek</option>
                 <option value="doubao">豆包 (Doubao)</option>
-                <option value="xiaomi">小米</option>
-                <option value="custom">自定义 API</option>
+                <option value="deepseek">DeepSeek</option>
+                <option value="glm">智谱清言 (GLM)</option>
+                <option value="wenxin">文心一言 (ERNIE)</option>
+                <option value="custom">自定义 (Custom / 其他)</option>
               </select>
             </div>
 

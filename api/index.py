@@ -24,7 +24,7 @@ class ChatRequest(BaseModel):
     定义从客户端接收的聊天请求结构
     """
     message: str              # 用户的语音转文字结果或直接输入的文本
-    model_provider: str       # 指定使用的大模型提供商 ('doubao', 'deepseek', 'xiaomi', 'custom')
+    model_provider: str       # 指定使用的大模型提供商 ('doubao', 'deepseek', 'glm', 'wenxin', 'custom')
     api_key: str              # 用于认证的API密钥
     api_url: Optional[str] = "" # 接口地址（对于自定义模型或者特定端点的大模型必须提供）
 
@@ -65,9 +65,13 @@ async def chat_endpoint(request: ChatRequest):
             url = url or "https://ark.cn-beijing.volces.com/api/v3/chat/completions"
             # 豆包通常需要具体的 endpoint ID，此处假设前端传递或者使用通用的
             model_name = "doubao-default" 
-        elif request.model_provider == "xiaomi":
-            url = url or "https://api.chat.xiaomi.com/v1/chat/completions" # 假设的小米大模型API地址
-            model_name = "xiaomi-default"
+        elif request.model_provider == "glm":
+            url = url or "https://open.bigmodel.cn/api/paas/v4/chat/completions"
+            model_name = "glm-4"
+        elif request.model_provider == "wenxin":
+            # 如果文心一言使用 OpenAI 兼容层，则使用这个；如果原生则需要获取 Access Token（此处预留 OpenAI 兼容方式，如千帆 API 的 openai 兼容端点）
+            url = url or "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions"
+            model_name = "ernie-bot-turbo"
         elif request.model_provider == "custom":
             if not url:
                 raise HTTPException(status_code=400, detail="自定义模型必须提供 api_url")
