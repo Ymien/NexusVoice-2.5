@@ -1,0 +1,35 @@
+name: Build and Release Desktop Apps
+
+on:
+  push:
+    tags:
+      - 'v*' # 当推送带有 v 前缀的 tag 时触发 (例如 v0.3.25)
+
+jobs:
+  release:
+    name: build-${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Vite App
+        run: npm run build
+
+      - name: Build Electron App & Release
+        uses: samuelmeuli/action-electron-builder@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          release: true

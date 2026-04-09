@@ -177,8 +177,12 @@ const VoiceControl: React.FC = () => {
         custom_model_name: customModelName
       };
 
-      // 调用 Vercel 上的 Python Serverless 接口或本地的 Vite 代理
-      const response = await fetch('/api/chat', {
+      // 如果在桌面客户端 (file://) 中运行，则使用你部署在云端的 Vercel 后端地址；否则使用相对路径
+      const isDesktop = window.location.protocol === 'file:';
+      const apiUrl = isDesktop ? 'https://nexusvoice-2-5.vercel.app/api/chat' : '/api/chat';
+
+      // 发起请求
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
