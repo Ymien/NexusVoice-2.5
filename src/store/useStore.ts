@@ -9,6 +9,7 @@ export interface Message {
   id: string;        // 消息的唯一标识
   role: 'user' | 'ai'; // 消息的发送者，'user'代表用户，'ai'代表系统
   content: string;   // 消息的具体内容文本
+  timestamp?: number; // 兼容旧版或新版加的时间戳
 }
 
 // 定义系统的状态和行为接口
@@ -122,10 +123,11 @@ export const useStore = create<AppState>()(
           if (error) throw error;
           if (data && data.length > 0) {
             const cloudMessages: Message[] = data.map(d => ({
-              id: d.message_id,
-              role: d.role,
-              content: d.content,
-            }));
+            id: d.message_id,
+            role: d.role as 'user' | 'ai',
+            content: d.content,
+            timestamp: new Date(d.timestamp).getTime()
+          }));
             set({ messages: cloudMessages });
           }
         } catch (err) {
