@@ -102,18 +102,27 @@ const VoiceControl: React.FC = () => {
     if (!window.speechSynthesis) return;
 
     // 播放视频
-    setPlayingVideo(true);
+    setVideoPlaying(true);
 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'zh-CN';
+    utterance.volume = 1;
+    utterance.rate = 1;
+    utterance.pitch = 1;
 
     // 尝试根据设置选择男声或女声（不同的系统/浏览器支持情况不同）
     const voices = window.speechSynthesis.getVoices();
-    const isMale = ttsVoice === 'male';
-    const preferredVoice = voices.find(v =>
+    const isMale = voiceType === 'male';
+    
+    let preferredVoice = voices.find(v =>
       v.lang.includes('zh') &&
-      (isMale ? v.name.toLowerCase().includes('male') || v.name.includes('男') : v.name.toLowerCase().includes('female') || v.name.includes('女'))
+      (isMale ? (v.name.toLowerCase().includes('male') || v.name.includes('男')) : (v.name.toLowerCase().includes('female') || v.name.includes('女')))
     );
+
+    // 如果没有找到明确的男声/女声，回退到任意一个中文声音
+    if (!preferredVoice) {
+      preferredVoice = voices.find(v => v.lang.includes('zh'));
+    }
 
     if (preferredVoice) {
       utterance.voice = preferredVoice;
@@ -121,13 +130,15 @@ const VoiceControl: React.FC = () => {
 
     utterance.onend = () => {
       // 播报结束，停止视频
-      setPlayingVideo(false);
+      setVideoPlaying(false);
     };
 
-    utterance.onerror = () => {
-      setPlayingVideo(false);
+    utterance.onerror = (e) => {
+      console.error('SpeechSynthesis error:', e);
+      setVideoPlaying(false);
     };
 
+    // 确保声音能被触发（解决某些浏览器因为垃圾回收导致不发声的bug）
     window.speechSynthesis.speak(utterance);
   };
 

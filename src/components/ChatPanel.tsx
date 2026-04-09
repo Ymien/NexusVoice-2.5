@@ -8,7 +8,7 @@ import { Volume2, Square } from 'lucide-react';
  */
 const ChatPanel: React.FC = () => {
   // 获取全局聊天消息和设置
-  const { messages, setPlayingVideo, ttsVoice } = useStore();
+  const { messages, setVideoPlaying, voiceType } = useStore();
   // 引用聊天容器底部的元素，用于实现自动滚动
   const messagesEndRef = useRef<HTMLDivElement>(null);
   // 记录当前正在朗读的消息 ID
@@ -24,7 +24,7 @@ const ChatPanel: React.FC = () => {
     return () => {
       if (window.speechSynthesis) {
         window.speechSynthesis.cancel();
-        setPlayingVideo(false);
+        setVideoPlaying(false);
       }
     };
   }, []);
@@ -42,26 +42,34 @@ const ChatPanel: React.FC = () => {
     if (speakingId === id) {
       window.speechSynthesis.cancel();
       setSpeakingId(null);
-      setPlayingVideo(false);
+      setVideoPlaying(false);
       return;
     }
 
     // 取消正在播放的其他语音
     window.speechSynthesis.cancel();
 
-    setPlayingVideo(true);
+    setVideoPlaying(true);
     setSpeakingId(id);
 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'zh-CN';
+    utterance.volume = 1;
+    utterance.rate = 1;
+    utterance.pitch = 1;
 
     // 尝试根据设置选择男声或女声
     const voices = window.speechSynthesis.getVoices();
-    const isMale = ttsVoice === 'male';
-    const preferredVoice = voices.find(v =>
+    const isMale = voiceType === 'male';
+    
+    let preferredVoice = voices.find(v =>
       v.lang.includes('zh') &&
-      (isMale ? v.name.toLowerCase().includes('male') || v.name.includes('男') : v.name.toLowerCase().includes('female') || v.name.includes('女'))
+      (isMale ? (v.name.toLowerCase().includes('male') || v.name.includes('男')) : (v.name.toLowerCase().includes('female') || v.name.includes('女')))
     );
+
+    if (!preferredVoice) {
+      preferredVoice = voices.find(v => v.lang.includes('zh'));
+    }
 
     if (preferredVoice) {
       utterance.voice = preferredVoice;
@@ -69,13 +77,18 @@ const ChatPanel: React.FC = () => {
 
     utterance.onend = () => {
       setSpeakingId(null);
-      setPlayingVideo(false);
+      setVideoPlaying(false);
     };
 
-    utterance.onerror = () => {
+    utterance.onerror = (e) => {
+      console.error('SpeechSynthesis error:', e);
       setSpeakingId(null);
-      setPlayingVideo(false);
+      setVideoPlaying(false);
     };
+
+    // Chrome/Safari 长文本不发声的黑科技补丁:
+    // 将 utterance 绑定到 window 全局变量，防止被垃圾回收机制意外销毁
+    (window as any)._currentUtterance = utterance;
 
     window.speechSynthesis.speak(utterance);
   };
