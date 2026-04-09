@@ -7,10 +7,18 @@ dist
 *.log
 coverage
 
+# Secret Files
+supabase_setup.sql
+*secret*
+*token*
+*key*
+
 # Backend
 backend/venv/
 backend/__pycache__/
 backend/*.pyc
+api/__pycache__/
+api/*.pyc
 
 # C++ Terminal
 cpp_terminal/build/
