@@ -58,7 +58,7 @@
   },
   "devDependencies": {
     "@capacitor/cli": "^6.0.0",
-    "electron": "^34.0.0",
+    "electron": "^39.8.5",
     "electron-builder": "^25.1.8",
     "concurrently": "^9.1.0",
     "cross-env": "^7.0.3",
