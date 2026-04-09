@@ -221,18 +221,18 @@ const VoiceControl: React.FC = () => {
   };
 
   return (
-    <div className="w-full flex items-center gap-3 p-4 bg-white dark:bg-zinc-900 border-t border-gray-200 dark:border-zinc-800 rounded-b-2xl">
+    <div className="w-full flex items-center gap-2 sm:gap-3 p-3 sm:p-4 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-2xl shadow-sm">
       {/* 录音按钮 */}
       <button
         onClick={toggleListening}
-        className={`p-4 rounded-full transition-all duration-300 shadow-md ${
-          isListening 
-            ? 'bg-red-500 text-white animate-pulse shadow-red-500/50' 
+        className={`p-3 sm:p-4 rounded-full transition-all duration-300 shadow-md shrink-0 ${
+          isListening
+            ? 'bg-red-500 text-white animate-pulse shadow-red-500/50'
             : 'bg-blue-100 text-blue-600 hover:bg-blue-200 dark:bg-zinc-800 dark:text-blue-400'
         }`}
         title={isListening ? "停止录音" : "开始录音"}
       >
-        {isListening ? <MicOff size={24} /> : <Mic size={24} />}
+        {isListening ? <MicOff className="w-5 h-5 sm:w-6 sm:h-6" /> : <Mic className="w-5 h-5 sm:w-6 sm:h-6" />}
       </button>
 
       {/* 文本输入框 */}
@@ -246,25 +246,25 @@ const VoiceControl: React.FC = () => {
           }
         }}
         placeholder="说出唤醒词或手动输入..."
-        className="flex-1 p-3 bg-gray-100 dark:bg-zinc-800 border-none rounded-xl text-gray-800 dark:text-zinc-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+        className="flex-1 min-w-0 p-2 sm:p-3 text-sm sm:text-base bg-gray-100 dark:bg-zinc-800 border-none rounded-xl text-gray-800 dark:text-zinc-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
       />
 
       {/* 发送按钮 */}
       <button
         onClick={() => handleSend()}
         disabled={!textInput.trim()}
-        className="p-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed text-white rounded-xl shadow-md transition-all"
+        className="p-2 sm:p-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed text-white rounded-xl shadow-md transition-all shrink-0"
       >
-        <Send size={20} />
+        <Send className="w-4 h-4 sm:w-5 sm:h-5" />
       </button>
 
       {/* 设置按钮 */}
       <button
         onClick={() => setSettingsOpen(true)}
-        className="p-3 bg-gray-100 hover:bg-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-gray-600 dark:text-zinc-400 rounded-xl transition-all"
+        className="hidden sm:block p-3 bg-gray-100 hover:bg-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-gray-600 dark:text-zinc-400 rounded-xl transition-all shrink-0"
         title="系统设置"
       >
-        <Settings size={20} />
+        <Settings className="w-5 h-5" />
       </button>
     </div>
   );
