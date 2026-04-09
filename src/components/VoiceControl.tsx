@@ -85,7 +85,8 @@ const VoiceControl: React.FC = () => {
     addMessage({
       id: Date.now().toString(),
       role: 'ai',
-      content: initialReply
+      content: initialReply,
+      timestamp: Date.now()
     });
     // 可以在此处重新启动录音，听取用户后续问题
     setTimeout(() => {
@@ -149,7 +150,8 @@ const VoiceControl: React.FC = () => {
     addMessage({
       id: Date.now().toString(),
       role: 'user',
-      content: msgText
+      content: msgText,
+      timestamp: Date.now()
     });
 
     try {
@@ -181,7 +183,8 @@ const VoiceControl: React.FC = () => {
       addMessage({
         id: (Date.now() + 1).toString(),
         role: 'ai',
-        content: data.reply
+        content: data.reply,
+        timestamp: Date.now() + 1
       });
 
       // 将AI回复转为语音播报并播放视频
@@ -192,7 +195,8 @@ const VoiceControl: React.FC = () => {
       addMessage({
         id: (Date.now() + 1).toString(),
         role: 'ai',
-        content: `抱歉，发生了错误: ${error.message}`
+        content: `抱歉，发生了错误: ${error.message}`,
+        timestamp: Date.now() + 1
       });
     }
   };
