@@ -19,7 +19,7 @@ English | [简体中文](./README.md)
 
 ### 🎙️ Lightning-Fast TTS & Visual Linkage
 - **Instant Vocalization**: Deeply optimized long-text asynchronous pronunciation mechanism across browsers and systems, thoroughly solving deadlock blockages to produce sound the moment you click.
-- **J.A.R.V.I.S. Visual Monitoring**: Features a built-in, highly sci-fi **fluid network particle video background**. When on standby or when the AI speaks, it dynamically triggers vibrant dopamine halos and breathing light effects, maximizing the visual experience.
+- **J.A.R.V.I.S. Visual Monitoring**: Features a built-in, highly sci-fi **fluid network particle video background**. When on standby or when the AI speaks, it dynamically triggers vibrant holographic halos and breathing light effects, maximizing the visual experience.
 
 ### 🎨 Colorful Themes & Defense Mechanisms
 - **Theme Adaptations**: Silky-smooth switching among multiple exquisite themes including `Light`, `Dark`, `Neon Cyber`, `Pastel Macaron`, and `Sunset Horizon`.
