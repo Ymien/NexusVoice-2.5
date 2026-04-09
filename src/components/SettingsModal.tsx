@@ -50,9 +50,10 @@ const SettingsModal: React.FC = () => {
                 onChange={(e) => setSettings({ modelProvider: e.target.value as any })}
                 className="w-full p-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 focus:ring-2 focus:ring-blue-500 outline-none"
               >
-                <option value="glm">火山引擎 - GLM-4 (GLM-4-7-251222)</option>
-                <option value="deepseek">火山引擎 - DeepSeek (deepseek-v3-1-terminus)</option>
-                <option value="custom">自定义 (Custom / 其他)</option>
+                <option value="doubao">豆包</option>
+                <option value="deepseek">DeepSeek</option>
+                <option value="kimi">Kimi</option>
+                <option value="custom">自定义 (其他)</option>
               </select>
             </div>
 

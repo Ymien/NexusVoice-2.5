@@ -155,7 +155,7 @@ const VoiceControl: React.FC = () => {
       const requestData = {
         message: msgText,
         model_provider: modelProvider,
-        api_key: modelProvider === 'custom' ? apiKey : '3ffbc74e-841a-47e6-b63e-7c77d69e0008',
+        api_key: modelProvider === 'custom' ? apiKey : '', // 默认模型不再从前端传key，由后端管理
         api_url: modelProvider === 'custom' ? customApiUrl : ''
       };
 

@@ -24,7 +24,7 @@ class ChatRequest(BaseModel):
     定义从客户端接收的聊天请求结构
     """
     message: str              # 用户的语音转文字结果或直接输入的文本
-    model_provider: str       # 指定使用的大模型提供商 ('doubao', 'deepseek', 'glm', 'wenxin', 'custom')
+    model_provider: str       # 指定使用的大模型提供商 ('doubao', 'deepseek', 'kimi', 'custom')
     api_key: str              # 用于认证的API密钥
     api_url: Optional[str] = "" # 接口地址（对于自定义模型或者特定端点的大模型必须提供）
 
@@ -57,10 +57,28 @@ async def chat_endpoint(request: ChatRequest):
         url = request.api_url
         model_name = "default-model"
         
+        # 预设模型的映射表 (名称和各自的API KEY)
+        preset_models = {
+            "doubao": {
+                "name": "ep-20250212002344-9p47d",
+                "key": "3ffbc74e-841a-47e6-b63e-7c77d69e0008"
+            },
+            "deepseek": {
+                "name": "deepseek-v3-1-terminus",
+                "key": "135c9178-d814-41fe-8f8f-c3e738897640"
+            },
+            "kimi": {
+                "name": "kimi-k2-thinking-251104",
+                "key": "7fb361cc-cf98-4902-9a81-48eaac9e61f2"
+            }
+        }
+
         # 根据不同的模型提供商设定默认的URL和模型名称
-        if request.model_provider in ["glm", "deepseek"]:
+        if request.model_provider in preset_models:
             url = url or "https://ark.cn-beijing.volces.com/api/v3/responses"
-            model_name = "glm-4-7-251222" if request.model_provider == "glm" else "deepseek-v3-1-terminus"
+            model_name = preset_models[request.model_provider]["name"]
+            # 自动覆盖使用预设的API Key
+            request.api_key = preset_models[request.model_provider]["key"]
             
             payload = {
                 "model": model_name,
@@ -114,7 +132,7 @@ async def chat_endpoint(request: ChatRequest):
             reply_text = ""
             
             # 处理 Volcengine 的 /api/v3/responses 返回格式
-            if request.model_provider in ["glm", "deepseek"]:
+            if request.model_provider in preset_models:
                 for item in data.get("output", []):
                     if item.get("type") == "message" and item.get("role") == "assistant":
                         for c in item.get("content", []):
