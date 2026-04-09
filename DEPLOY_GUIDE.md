@@ -32,8 +32,8 @@
   **Value**: `3ffbc74e-841a-47e6-b63e-7c77d69e0008`
 - **Key**: `VITE_DEEPSEEK_API_KEY`
   **Value**: `135c9178-d814-41fe-8f8f-c3e738897640`
-- **Key**: `VITE_KIMI_API_KEY`
-  **Value**: `7fb361cc-cf98-4902-9a81-48eaac9e61f2`
+- **Key**: `VITE_DOUBAO_API_KEY`
+  **Value**: `3ffbc74e-841a-47e6-b63e-7c77d69e0008` (或者你的豆包 API Key)
 
 **💡 填完上述变量后，记得去 Vercel 的 Deployments 页面点击最新的部署记录，选择 Redeploy（重新部署），环境变量才会生效。**
 

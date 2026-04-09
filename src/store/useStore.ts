@@ -22,8 +22,8 @@ interface AppState {
   initialReply: string;      // 唤醒后的首次回复，例如 "我在呢"
   ttsVoice: 'male' | 'female'; // TTS发音人性别
   videoUrl: string;          // 同步播放的视频地址
-  modelProvider: 'glm' | 'deepseek' | 'kimi' | 'custom';
-  setModelProvider: (provider: 'glm' | 'deepseek' | 'kimi' | 'custom') => void;
+  modelProvider: 'glm' | 'deepseek' | 'doubao' | 'custom';
+  setModelProvider: (provider: 'glm' | 'deepseek' | 'doubao' | 'custom') => void;
   apiKey: string;            // LLM的API Key
   customApiUrl: string;      // 自定义API地址
   

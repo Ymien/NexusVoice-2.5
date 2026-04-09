@@ -24,7 +24,7 @@ class ChatRequest(BaseModel):
     定义从客户端接收的聊天请求结构
     """
     message: str              # 用户的语音转文字结果或直接输入的文本
-    model_provider: str       # 指定使用的大模型提供商 ('glm', 'deepseek', 'kimi', 'custom')
+    model_provider: str       # 指定使用的大模型提供商 ('glm', 'deepseek', 'doubao', 'custom')
     api_key: str              # 用于认证的API密钥
     api_url: Optional[str] = "" # 接口地址（对于自定义模型或者特定端点的大模型必须提供）
 
@@ -62,7 +62,7 @@ async def chat_endpoint(request: ChatRequest):
         # 请在你的部署环境（如 Vercel -> Settings -> Environment Variables）中设置以下变量：
         # - VITE_GLM_API_KEY
         # - VITE_DEEPSEEK_API_KEY
-        # - VITE_KIMI_API_KEY
+        # - VITE_DOUBAO_API_KEY
         preset_models = {
             "glm": {
                 "name": "glm-4-7-251222",
@@ -72,9 +72,9 @@ async def chat_endpoint(request: ChatRequest):
                 "name": "deepseek-v3-1-terminus",
                 "key": os.environ.get("VITE_DEEPSEEK_API_KEY", "")
             },
-            "kimi": {
-                "name": "kimi-k2-thinking-251104",
-                "key": os.environ.get("VITE_KIMI_API_KEY", "")
+            "doubao": {
+                "name": "ep-20250212002344-9p47d",
+                "key": os.environ.get("VITE_DOUBAO_API_KEY", "")
             }
         }
 
