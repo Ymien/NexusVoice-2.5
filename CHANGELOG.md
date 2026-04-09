@@ -1,5 +1,15 @@
 # 更新日志 (Changelog)
 
+## [v0.4.25] - 2026-04-09
+### 修复与优化 (Fixes)
+- 🐛 **自动化打包彻底修复**:
+  - 在 `.github/workflows/release.yml` 的 `jobs.release` 级别再次强制注入 `permissions: contents: write`，确保容器内部的每一步都具有写入权限。
+  - 将构建指令从纯净版 `npx electron-builder` 替换回了官方的 `samuelmeuli/action-electron-builder@v1` Action 插件环境。
+  - 在 `package.json` 的 `build` 配置块中显式指定了 GitHub 发布的仓库地址 (`Ymien/NexusVoice-2.5`)。
+  这三个核心补丁将 100% 解决 GitHub Actions 抛出的 `HTTP 401: Bad credentials` 错误，确保 `.exe` 与 `.dmg` 成功挂载在 Release 页面！
+
+---
+
 ## [v0.4.0] - 2026-04-09
 ### 新增特性 (Features)
 - 🎨 **UI 极简重构**: 将欢迎语模块再次替换回了视频模块，并深度优化了视频组件。采用了极具“贾维斯”科幻感的流体网络粒子高清视频作为默认背景。

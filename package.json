@@ -1,7 +1,7 @@
 {
   "name": "workspace",
   "private": true,
-  "version": "0.4.0",
+  "version": "0.4.25",
   "type": "module",
   "repository": {
     "type": "git",
@@ -24,6 +24,13 @@
     "directories": {
       "output": "release"
     },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "Ymien",
+        "repo": "NexusVoice-2.5"
+      }
+    ],
     "files": [
       "dist/**/*",
       "electron-main.js"

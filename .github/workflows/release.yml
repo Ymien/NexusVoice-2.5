@@ -11,6 +11,8 @@ permissions:
 jobs:
   release:
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write # 赋予全局写权限，允许创建 Release 和上传 Assets
     strategy:
       matrix:
         os: [windows-latest, macos-latest] # 移除 linux 以加快构建速度
@@ -31,6 +33,7 @@ jobs:
         run: npm run build
 
       - name: Build & Publish Electron App
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Electron Builder 自动读取此 Token 上传到 Release
-        run: npx electron-builder --publish always
+        uses: samuelmeuli/action-electron-builder@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          release: true
