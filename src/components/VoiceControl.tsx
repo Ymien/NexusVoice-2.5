@@ -158,8 +158,8 @@ const VoiceControl: React.FC = () => {
         api_url: customApiUrl
       };
 
-      // 注意：请确保后端运行在 http://localhost:8000
-      const response = await fetch('http://localhost:8000/api/chat', {
+      // 调用 Vercel 上的 Python Serverless 接口或本地的 Vite 代理
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

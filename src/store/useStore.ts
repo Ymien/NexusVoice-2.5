@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { supabase } from '../lib/supabase';
 
 // ----------------- 类型定义 -----------------
 
@@ -12,6 +13,10 @@ export interface Message {
 
 // 定义系统的状态和行为接口
 interface AppState {
+  // 用户认证
+  user: any | null;
+  setUser: (user: any | null) => void;
+
   // 设置相关的状态
   wakeWord: string;          // 唤醒词，例如 "小艾"
   initialReply: string;      // 唤醒后的首次回复，例如 "我在呢"
@@ -34,6 +39,8 @@ interface AppState {
   setPlayingVideo: (playing: boolean) => void;        // 设置视频播放状态
   setSettingsOpen: (open: boolean) => void;           // 设置弹窗开关状态
   clearMessages: () => void;                          // 清空聊天记录
+  syncMessagesToCloud: () => Promise<void>;
+  fetchMessagesFromCloud: () => Promise<void>;
 }
 
 // ----------------- Zustand 状态管理库实例化 -----------------
@@ -42,7 +49,16 @@ interface AppState {
 // 以防止刷新页面后丢失用户的配置信息
 export const useStore = create<AppState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
+      // 用户认证
+      user: null,
+      setUser: (user) => {
+        set({ user });
+        if (user) {
+          get().fetchMessagesFromCloud();
+        }
+      },
+
       // 默认设置值
       wakeWord: '小艾',
       initialReply: '我在呢，请问有什么可以帮您？',
@@ -60,15 +76,63 @@ export const useStore = create<AppState>()(
 
       // 状态修改实现
       setSettings: (settings) => set((state) => ({ ...state, ...settings })),
-      addMessage: (msg) => set((state) => ({ messages: [...state.messages, msg] })),
+      addMessage: async (msg) => {
+        set((state) => ({ messages: [...state.messages, msg] }));
+        const { user } = get();
+        if (user) {
+          // 异步保存到 Supabase
+          await supabase.from('chat_history').insert({
+            user_id: user.id,
+            message_id: msg.id,
+            role: msg.role,
+            content: msg.content,
+            timestamp: new Date().toISOString()
+          }).then(res => { if (res.error) console.error(res.error); });
+        }
+      },
       setListening: (listening) => set({ isListening: listening }),
       setPlayingVideo: (playing) => set({ isPlayingVideo: playing }),
       setSettingsOpen: (open) => set({ isSettingsOpen: open }),
-      clearMessages: () => set({ messages: [] }),
+      clearMessages: async () => {
+        set({ messages: [] });
+        const { user } = get();
+        if (user) {
+          await supabase.from('chat_history').delete().eq('user_id', user.id).then(res => { if(res.error) console.error(res.error); });
+        }
+      },
+
+      syncMessagesToCloud: async () => {
+        const { user, messages } = get();
+        if (!user || messages.length === 0) return;
+        // 简单实现：这里可以添加批量同步逻辑
+      },
+
+      fetchMessagesFromCloud: async () => {
+        const { user } = get();
+        if (!user) return;
+        try {
+          const { data, error } = await supabase
+            .from('chat_history')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('timestamp', { ascending: true });
+          
+          if (error) throw error;
+          if (data && data.length > 0) {
+            const cloudMessages: Message[] = data.map(d => ({
+              id: d.message_id,
+              role: d.role,
+              content: d.content,
+            }));
+            set({ messages: cloudMessages });
+          }
+        } catch (err) {
+          console.error("同步云端记录失败", err);
+        }
+      },
     }),
     {
       name: 'voice-chat-storage', // localStorage 中的键名
-      // 仅持久化保存设置相关的字段，运行时状态（如聊天记录和正在播放状态）不保存
       partialize: (state) => ({
         wakeWord: state.wakeWord,
         initialReply: state.initialReply,
@@ -77,6 +141,7 @@ export const useStore = create<AppState>()(
         modelProvider: state.modelProvider,
         apiKey: state.apiKey,
         customApiUrl: state.customApiUrl,
+        messages: state.user ? [] : state.messages // 如果已登录，不持久化到本地，从云端拉取
       }),
     }
   )
