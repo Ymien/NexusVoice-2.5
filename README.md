@@ -1,6 +1,6 @@
 # NexusVoice (智能多模态语音系统)
 
-![Version](https://img.shields.io/badge/version-v0.6.0-blue.svg)
+![Version](https://img.shields.io/badge/version-v0.6.50-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Android%20%7C%20Web-success.svg)
 
 > **NexusVoice** 是一款生产级多模态智能语音交互系统，为您提供类似钢铁侠“贾维斯”的沉浸式桌面仪表盘体验。
@@ -19,7 +19,7 @@
 - **贾维斯视觉监控**：内置极具科幻感的**流体网络粒子视频背景**。在待机与 AI 说话时，动态触发炫彩的多巴胺光环与呼吸灯效，视觉体验拉满。
 
 ### 🎨 多彩主题与防御机制
-- **多巴胺适配**：自由在 `清爽浅色 (Light)`、`沉浸深色 (Dark)` 和 `活力多巴胺 (Dopamine)` 主题之间丝滑切换。
+- **多巴胺适配**：自由在 `清爽浅色 (Light)`、`沉浸深色 (Dark)`、`赛博多巴胺 (Neon Cyber)`、`马卡龙多巴胺 (Pastel Macaron)` 和 `日落多巴胺 (Sunset Horizon)` 等多个精美主题之间丝滑切换。
 - **强制指令防御**：内置强力系统防线，智能阻断模型产生“随意播报当前时间”等冗余幻觉，保障对话的纯粹与自然。
 
 ---

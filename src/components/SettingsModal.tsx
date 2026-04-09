@@ -49,12 +49,14 @@ const SettingsModal: React.FC = () => {
               <label className="text-sm text-gray-700 dark:text-zinc-300">系统主题 (Theme)</label>
               <select
                 value={theme}
-                onChange={(e) => setSettings({ theme: e.target.value as 'light' | 'dark' | 'dopamine' })}
+                onChange={(e) => setSettings({ theme: e.target.value as 'light' | 'dark' | 'dopamine-neon' | 'dopamine-macaron' | 'dopamine-sunset' })}
                 className="w-full p-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 focus:ring-2 focus:ring-blue-500 outline-none"
               >
                 <option value="light">清爽浅色 (Light)</option>
                 <option value="dark">沉浸深色 (Dark)</option>
-                <option value="dopamine">活力多巴胺 (Dopamine)</option>
+                <option value="dopamine-neon">赛博多巴胺 (Neon Cyber)</option>
+                <option value="dopamine-macaron">马卡龙多巴胺 (Pastel Macaron)</option>
+                <option value="dopamine-sunset">日落多巴胺 (Sunset Horizon)</option>
               </select>
             </div>
           </div>

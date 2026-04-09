@@ -21,11 +21,11 @@ export default function Home() {
   // Apply theme to document element for global CSS
   useEffect(() => {
     const root = document.documentElement;
-    root.classList.remove('dark', 'theme-dopamine');
+    root.classList.remove('dark', 'theme-dopamine-neon', 'theme-dopamine-macaron', 'theme-dopamine-sunset');
     if (theme === 'dark') {
       root.classList.add('dark');
-    } else if (theme === 'dopamine') {
-      root.classList.add('theme-dopamine');
+    } else if (theme.startsWith('dopamine')) {
+      root.classList.add(`theme-${theme}`);
     }
   }, [theme]);
 

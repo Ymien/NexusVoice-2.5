@@ -21,13 +21,31 @@
     --accent-glow: rgba(139, 92, 246, 0.15);
   }
 
-  .theme-dopamine {
-    --bg-primary: #FFF8F0;
-    --bg-panel: #FFFFFF;
-    --text-primary: #2D3436;
-    --text-secondary: #636E72;
-    --border-color: #FFEAA7;
-    --accent-glow: rgba(255, 107, 158, 0.2);
+  .theme-dopamine-neon {
+    --bg-primary: #0a0a1a;
+    --bg-panel: #14142b;
+    --text-primary: #00ffff;
+    --text-secondary: #ff00ff;
+    --border-color: #39ff14;
+    --accent-glow: rgba(0, 255, 255, 0.3);
+  }
+
+  .theme-dopamine-macaron {
+    --bg-primary: #fff0f5;
+    --bg-panel: #ffffff;
+    --text-primary: #5c4b51;
+    --text-secondary: #8c7a80;
+    --border-color: #ffb7b2;
+    --accent-glow: rgba(255, 183, 178, 0.4);
+  }
+
+  .theme-dopamine-sunset {
+    --bg-primary: #fff3e0;
+    --bg-panel: #ffffff;
+    --text-primary: #4a1c40;
+    --text-secondary: #d84339;
+    --border-color: #ffb74d;
+    --accent-glow: rgba(255, 138, 101, 0.3);
   }
 }
 
