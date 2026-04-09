@@ -46,8 +46,9 @@ const ChatPanel: React.FC = () => {
       return;
     }
 
-    // 取消正在播放的其他语音
+    // 取消正在播放的其他语音并恢复引擎
     window.speechSynthesis.cancel();
+    window.speechSynthesis.resume();
 
     setVideoPlaying(true);
     setSpeakingId(id);

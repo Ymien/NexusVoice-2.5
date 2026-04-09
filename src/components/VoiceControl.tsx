@@ -101,6 +101,10 @@ const VoiceControl: React.FC = () => {
   const speakText = (text: string) => {
     if (!window.speechSynthesis) return;
 
+    // 清除可能卡住的语音队列，并恢复引擎状态
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.resume();
+
     // 播放视频
     setVideoPlaying(true);
 
@@ -139,6 +143,7 @@ const VoiceControl: React.FC = () => {
     };
 
     // 确保声音能被触发（解决某些浏览器因为垃圾回收导致不发声的bug）
+    (window as any)._currentUtterance = utterance;
     window.speechSynthesis.speak(utterance);
   };
 
@@ -148,6 +153,15 @@ const VoiceControl: React.FC = () => {
    */
   const handleSend = async (message: string = textInput) => {
     if (!message.trim()) return;
+
+    // ----- [黑科技补丁] 解决部分浏览器在异步请求后阻塞语音播报的问题 -----
+    // 如果用户是点击发送按钮触发的（同步状态），先发送一个空语音来激活引擎权限
+    if (window.speechSynthesis) {
+        const prime = new SpeechSynthesisUtterance('');
+        prime.volume = 0;
+        window.speechSynthesis.speak(prime);
+    }
+    // ---------------------------------------------------------------
 
     // 停止当前的语音识别（如果有）
     if (isListening && recognitionRef.current) {

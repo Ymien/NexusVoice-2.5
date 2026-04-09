@@ -102,20 +102,11 @@ async def chat_endpoint(request: ChatRequest):
                 ],
                 "input": [
                     {
-                        "role": "system",
-                        "content": [
-                            {
-                                "type": "input_text",
-                                "text": "你是一个智能语音助手。请用简短、口语化的语言回答。**极其重要**：除非用户明确询问时间，否则绝不要主动报告当前时间或日期。如果用户只是说“你好”等问候语，请直接回复标准的问候，如“你好！有什么我可以帮你的吗？”，绝对不要带上时间或日期信息。"
-                            }
-                        ]
-                    },
-                    {
                         "role": "user",
                         "content": [
                             {
                                 "type": "input_text",
-                                "text": request.message
+                                "text": f"【系统要求：你是一个智能语音助手，除非我明确问你时间，否则绝不要主动报告当前的时间、日期或星期！如果我只是对你说“你好”等问候语，请直接回复“你好！有什么我可以帮你的吗？”，绝对不要带上任何关于时间或日期的信息。】\n\n我的话是：{request.message}"
                             }
                         ]
                     }
@@ -167,15 +158,18 @@ async def chat_endpoint(request: ChatRequest):
                 
             return ChatResponse(reply=reply_text)
             
-    except urllib.error.HTTPError as e:
-        error_body = e.read().decode('utf-8')
+    except httpx.HTTPStatusError as e:
+        error_msg = str(e)
         try:
-            err_json = json.loads(error_body)
-            error_msg = err_json.get("error", {}).get("message", error_body)
+            err_json = e.response.json()
+            error_msg = err_json.get("error", {}).get("message", error_msg)
         except:
-            error_msg = error_body
-        print(f"模型API请求失败: HTTP {e.code} - {error_msg}")
-        return ChatResponse(reply="", error=f"模型API请求失败: HTTP {e.code} - {error_msg}")
+            pass
+        print(f"模型API请求状态失败: HTTP {e.response.status_code} - {error_msg}")
+        return ChatResponse(reply="", error=f"模型API请求失败: HTTP {e.response.status_code} - {error_msg}")
+    except httpx.RequestError as e:
+        print(f"模型API网络请求异常: {str(e)}")
+        return ChatResponse(reply="", error=f"网络请求异常: {str(e)}")
     except Exception as e:
         print(f"服务器内部错误: {str(e)}")
         # 捕获并返回任何运行时异常，避免后端崩溃
