@@ -22,7 +22,7 @@ interface AppState {
   initialReply: string;      // 唤醒后的首次回复，例如 "我在呢"
   ttsVoice: 'male' | 'female'; // TTS发音人性别
   videoUrl: string;          // 同步播放的视频地址
-  modelProvider: 'doubao' | 'deepseek' | 'glm' | 'wenxin' | 'custom'; // 使用的LLM提供商
+  modelProvider: 'deepseek' | 'glm' | 'custom'; // 使用的LLM提供商
   apiKey: string;            // LLM的API Key
   customApiUrl: string;      // 自定义API地址
   

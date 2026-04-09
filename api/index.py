@@ -57,46 +57,50 @@ async def chat_endpoint(request: ChatRequest):
         url = request.api_url
         model_name = "default-model"
         
-        # 根据不同的模型提供商设定默认的URL和模型名称（如果前端没有提供）
-        if request.model_provider == "deepseek":
-            url = url or "https://api.deepseek.com/chat/completions"
-            model_name = "deepseek-chat"
-        elif request.model_provider == "doubao":
-            url = url or "https://ark.cn-beijing.volces.com/api/v3/chat/completions"
-            model_name = "ep-20250212002344-9p47d"
-        elif request.model_provider == "glm":
-            url = url or "https://ark.cn-beijing.volces.com/api/v3/chat/completions"
-            model_name = "glm-4-7-251222"
-        elif request.model_provider == "wenxin":
-            # 如果文心一言使用 OpenAI 兼容层，则使用这个；如果原生则需要获取 Access Token（此处预留 OpenAI 兼容方式，如千帆 API 的 openai 兼容端点）
-            url = url or "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions"
-            model_name = "ernie-bot-turbo"
+        # 根据不同的模型提供商设定默认的URL和模型名称
+        if request.model_provider in ["glm", "deepseek"]:
+            url = url or "https://ark.cn-beijing.volces.com/api/v3/responses"
+            model_name = "glm-4-7-251222" if request.model_provider == "glm" else "deepseek-v3-1-terminus"
+            
+            payload = {
+                "model": model_name,
+                "stream": False,
+                "tools": [
+                    {
+                        "type": "web_search",
+                        "max_keyword": 3
+                    }
+                ],
+                "input": [
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "input_text",
+                                "text": request.message
+                            }
+                        ]
+                    }
+                ]
+            }
         elif request.model_provider == "custom":
             if not url:
                 raise HTTPException(status_code=400, detail="自定义模型必须提供 api_url")
             model_name = "custom-model"
-            
+            payload = {
+                "model": model_name,
+                "messages": [
+                    {"role": "system", "content": "你是一个有用的语音助手。请用简短、口语化的语言回答，因为你的回答将被转换为语音播报。"},
+                    {"role": "user", "content": request.message}
+                ]
+            }
+        else:
+            raise HTTPException(status_code=400, detail="不支持的模型提供商")
+
         headers = {
             "Authorization": f"Bearer {request.api_key}",
             "Content-Type": "application/json"
         }
-        
-        payload = {
-            "model": model_name,
-            "messages": [
-                {"role": "system", "content": "你是一个有用的语音助手。请用简短、口语化的语言回答，因为你的回答将被转换为语音播报。"},
-                {"role": "user", "content": request.message}
-            ]
-        }
-        
-        # 针对 glm 增加联网搜索工具（如果你提供的 glm 模型端点支持联网的话）
-        if request.model_provider == "glm":
-            payload["tools"] = [
-                {
-                    "type": "web_search",
-                    "max_keyword": 3
-                }
-            ]
         
         # 使用 httpx 进行异步 HTTP 请求，提升并发性能
         async with httpx.AsyncClient(timeout=30.0) as client:
@@ -107,12 +111,21 @@ async def chat_endpoint(request: ChatRequest):
                 return ChatResponse(reply="", error=f"模型API请求失败, 状态码: {response.status_code}, 错误信息: {response.text}")
                 
             data = response.json()
-            # 从OpenAI兼容的响应格式中提取回复文本
-            # 格式通常为: {"choices": [{"message": {"content": "回答内容"}}]}
-            reply_text = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+            reply_text = ""
             
+            # 处理 Volcengine 的 /api/v3/responses 返回格式
+            if request.model_provider in ["glm", "deepseek"]:
+                for item in data.get("output", []):
+                    if item.get("type") == "message" and item.get("role") == "assistant":
+                        for c in item.get("content", []):
+                            if c.get("type") == "output_text":
+                                reply_text += c.get("text", "")
+            else:
+                # 从OpenAI兼容的响应格式中提取回复文本
+                reply_text = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+
             if not reply_text:
-                return ChatResponse(reply="", error="模型返回的数据格式无法解析内容")
+                return ChatResponse(reply="", error="模型返回的数据格式无法解析内容: " + str(data))
                 
             return ChatResponse(reply=reply_text)
             

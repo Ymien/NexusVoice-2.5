@@ -151,11 +151,12 @@ const VoiceControl: React.FC = () => {
 
     try {
       // 准备发送给后端的请求数据
+      // 如果用户选择了默认模型，不传递 apiKey，让后端使用系统环境变量或默认密钥
       const requestData = {
         message: msgText,
         model_provider: modelProvider,
-        api_key: apiKey,
-        api_url: customApiUrl
+        api_key: modelProvider === 'custom' ? apiKey : '3ffbc74e-841a-47e6-b63e-7c77d69e0008',
+        api_url: modelProvider === 'custom' ? customApiUrl : ''
       };
 
       // 调用 Vercel 上的 Python Serverless 接口或本地的 Vite 代理

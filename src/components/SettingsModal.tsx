@@ -51,35 +51,39 @@ const SettingsModal: React.FC = () => {
                 className="w-full p-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 focus:ring-2 focus:ring-blue-500 outline-none"
               >
                 <option value="glm">火山引擎 - GLM-4 (GLM-4-7-251222)</option>
-                <option value="doubao">火山引擎 - 豆包 (Doubao)</option>
-                <option value="deepseek">DeepSeek</option>
-                <option value="wenxin">文心一言 (ERNIE)</option>
+                <option value="deepseek">火山引擎 - DeepSeek (deepseek-v3-1-terminus)</option>
                 <option value="custom">自定义 (Custom / 其他)</option>
               </select>
             </div>
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-sm text-gray-700 dark:text-zinc-300">API Key</label>
-              <input
-                type="password"
-                value={apiKey}
-                onChange={(e) => setSettings({ apiKey: e.target.value })}
-                placeholder="请输入 API 密钥"
-                className="w-full p-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 focus:ring-2 focus:ring-blue-500 outline-none"
-              />
-            </div>
-
+            {/* 仅在选择自定义模型时显示 API Key 和 URL 配置 */}
             {modelProvider === 'custom' && (
-              <div className="flex flex-col gap-1.5">
-                <label className="text-sm text-gray-700 dark:text-zinc-300">自定义 API URL</label>
-                <input
-                  type="text"
-                  value={customApiUrl}
-                  onChange={(e) => setSettings({ customApiUrl: e.target.value })}
-                  placeholder="例如: https://your-custom-api.com/v1/chat/completions"
-                  className="w-full p-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 focus:ring-2 focus:ring-blue-500 outline-none"
-                />
-              </div>
+              <>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm text-gray-700 dark:text-zinc-300">API Key (密钥)</label>
+                  <input
+                    type="password"
+                    value={apiKey}
+                    onChange={(e) => setSettings({ apiKey: e.target.value })}
+                    placeholder="sk-..."
+                    className="w-full p-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 focus:ring-2 focus:ring-blue-500 outline-none"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm text-gray-700 dark:text-zinc-300">自定义接口地址 (API URL)</label>
+                  <input
+                    type="text"
+                    value={customApiUrl}
+                    onChange={(e) => setSettings({ customApiUrl: e.target.value })}
+                    placeholder="例如: https://your-custom-api.com/v1/chat/completions"
+                    className="w-full p-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 focus:ring-2 focus:ring-blue-500 outline-none"
+                  />
+                  <p className="mt-1 text-xs text-gray-500 dark:text-zinc-400">
+                    * 仅当选择“自定义”模型时需要填写完整的端点地址
+                  </p>
+                </div>
+              </>
             )}
           </div>
 
