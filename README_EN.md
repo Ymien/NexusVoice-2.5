@@ -2,7 +2,7 @@
 
 English | [简体中文](./README.md)
 
-![Version](https://img.shields.io/badge/version-v0.7.0-blue.svg)
+![Version](https://img.shields.io/badge/version-v0.7.25-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Android%20%7C%20Web-success.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
