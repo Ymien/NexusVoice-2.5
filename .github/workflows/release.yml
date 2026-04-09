@@ -3,17 +3,17 @@ name: Build and Release Desktop Apps
 on:
   push:
     tags:
-      - 'v*' # 当推送带有 v 前缀的 tag 时触发 (例如 v0.3.25)
+      - 'v*'
+
+permissions:
+  contents: write # 赋予全局写权限，允许创建 Release 和上传 Assets
 
 jobs:
   release:
-    name: build-${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    permissions:
-      contents: write # 关键修复：赋予 Github Actions 写权限以创建 Release
     strategy:
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
+        os: [windows-latest, macos-latest] # 移除 linux 以加快构建速度
 
     steps:
       - name: Check out Git repository
@@ -30,8 +30,7 @@ jobs:
       - name: Build Vite App
         run: npm run build
 
-      - name: Build Electron App & Release
-        uses: samuelmeuli/action-electron-builder@v1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          release: true
+      - name: Build & Publish Electron App
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Electron Builder 自动读取此 Token 上传到 Release
+        run: npx electron-builder --publish always

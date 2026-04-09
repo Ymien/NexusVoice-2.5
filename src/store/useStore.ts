@@ -70,7 +70,7 @@ export const useStore = create<AppState>()(
       wakeWord: '小艾',
       initialReply: '我在呢，请问有什么可以帮您？',
       ttsVoice: 'female',
-      videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', // 默认占位视频
+      videoUrl: 'https://cdn.pixabay.com/video/2020/05/25/40131-424933866_large.mp4', // 替换为极具科技感、Jarvis风格的流体网络粒子高清视频
       modelProvider: 'glm',
       setModelProvider: (provider) => set({ modelProvider: provider }),
       apiKey: '', // 前端不再存储默认的 API Key，后端直接使用字典映射

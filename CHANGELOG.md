@@ -1,5 +1,13 @@
 # 更新日志 (Changelog)
 
+## [v0.4.0] - 2026-04-09
+### 新增特性 (Features)
+- 🎨 **UI 极简重构**: 将欢迎语模块再次替换回了视频模块，并深度优化了视频组件。采用了极具“贾维斯”科幻感的流体网络粒子高清视频作为默认背景。
+- 🌟 **多巴胺呼吸灯效**: 融合多主题配置，当 AI 说话并播放视频时，视频区域会出现带有环境光辉的动态指示器，界面交互更加精致。
+- 📦 **自动化部署权限彻底修复**: 在 `.github/workflows/release.yml` 提升了 workflow 级别的 `permissions: contents: write`，彻底解决了 GitHub Actions 中 `error validating token: HTTP 401: Bad credentials` 导致无法发布 release 版本的问题。
+
+---
+
 ## [v0.3.75] - 2026-04-09
 ### 新增特性 (Features)
 - 🎨 **多主题适配 & 多巴胺配色**: 将原本单一的黑暗/明亮模式重构，加入了全新的“多巴胺 (Dopamine)”主题。引入了 Plus Jakarta Sans 和 Outfit 字体，为桌面仪表盘提供更生动、精美的视觉效果。

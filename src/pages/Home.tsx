@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import ChatPanel from '../components/ChatPanel';
 import VoiceControl from '../components/VoiceControl';
-import WelcomeGreeting from '../components/WelcomeGreeting';
+import VideoPlayer from '../components/VideoPlayer';
 import SettingsModal from '../components/SettingsModal';
 import AuthModal from '../components/AuthModal';
 import { useStore } from '../store/useStore';
 import { supabase } from '../lib/supabase';
-import { Settings, LogOut, User, Sparkles } from 'lucide-react';
+import { Settings, LogOut, User, Sparkles, LayoutDashboard } from 'lucide-react';
 
 export default function Home() {
   const setSettingsOpen = useStore((state) => state.setSettingsOpen);
@@ -110,13 +110,13 @@ export default function Home() {
         
         {/* 左侧控制与视频面板 (Sidebar) */}
         <aside className="w-full md:w-[360px] lg:w-[420px] xl:w-[480px] shrink-0 flex flex-col gap-4 lg:gap-6 overflow-y-auto md:overflow-visible">
-          {/* 视频监控卡片 / 欢迎页面 */}
+          {/* 视频监控卡片 / 重新设计为极简 AI 视觉模块 */}
           <div className="w-full aspect-video md:aspect-auto md:flex-1 rounded-3xl overflow-hidden shadow-2xl border border-[var(--border-color)] relative group min-h-[220px] transition-all duration-500">
-            <div className="absolute top-4 left-4 z-10 flex items-center gap-2 bg-[var(--bg-primary)]/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-[var(--border-color)]">
+            <div className="absolute top-4 left-4 z-20 flex items-center gap-2 bg-[var(--bg-primary)]/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-[var(--border-color)] shadow-lg">
               <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-              <span className="text-xs font-semibold text-[var(--text-primary)] tracking-wide">NEXUS AI</span>
+              <span className="text-xs font-bold text-[var(--text-primary)] tracking-widest uppercase">NEXUS AI</span>
             </div>
-            <WelcomeGreeting />
+            <VideoPlayer />
           </div>
 
           {/* 语音交互控制台 */}
