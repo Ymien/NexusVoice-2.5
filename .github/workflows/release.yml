@@ -31,12 +31,19 @@ jobs:
       - name: Build & Publish Windows EXE
         uses: samuelmeuli/action-electron-builder@v1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GH_PAT }}
           release: true
           build_script_name: build
           args: --win
 
+      - name: Update Windows Release Body
+        run: |
+          gh release edit ${{ github.ref_name }} --notes-file changelogs/CHANGELOG_${{ github.ref_name }}.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+
   release-android:
+    needs: release-windows
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -76,7 +83,7 @@ jobs:
           ./gradlew assembleDebug
 
       - name: Upload APK to Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: android/app/build/outputs/apk/debug/app-debug.apk
-          token: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload ${{ github.ref_name }} android/app/build/outputs/apk/debug/app-debug.apk --clobber
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
