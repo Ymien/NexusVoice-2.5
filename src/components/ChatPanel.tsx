@@ -49,19 +49,15 @@ const ChatPanel: React.FC = () => {
     // 取消正在播放的其他语音
     window.speechSynthesis.cancel();
 
-    // 延迟一小段时间再播放，防止 cancel() 误杀新任务
-    setTimeout(() => {
-      setPlayingVideo(true);
-      setSpeakingId(id);
+    setPlayingVideo(true);
+    setSpeakingId(id);
 
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'zh-CN';
-      utterance.volume = 1;
-      utterance.rate = 1;
-      utterance.pitch = 1;
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'zh-CN';
 
-      // 尝试根据设置选择男声或女声
-      const voices = window.speechSynthesis.getVoices();
+    // 尝试根据设置选择男声或女声
+    const voices = window.speechSynthesis.getVoices();
+    if (voices && voices.length > 0) {
       const isMale = ttsVoice === 'male';
       
       let preferredVoice = voices.find(v =>
@@ -76,23 +72,23 @@ const ChatPanel: React.FC = () => {
       if (preferredVoice) {
         utterance.voice = preferredVoice;
       }
+    }
 
-      utterance.onend = () => {
-        setSpeakingId(null);
-        setPlayingVideo(false);
-      };
+    utterance.onend = () => {
+      setSpeakingId(null);
+      setPlayingVideo(false);
+    };
 
-      utterance.onerror = (e) => {
-        console.error('SpeechSynthesis error:', e);
-        setSpeakingId(null);
-        setPlayingVideo(false);
-      };
+    utterance.onerror = (e) => {
+      console.error('SpeechSynthesis error:', e);
+      setSpeakingId(null);
+      setPlayingVideo(false);
+    };
 
-      // Chrome/Safari 长文本不发声的黑科技补丁
-      (window as any)._currentUtterance = utterance;
+    // Chrome/Safari 长文本不发声的黑科技补丁
+    (window as any)._currentUtterance = utterance;
 
-      window.speechSynthesis.speak(utterance);
-    }, 50);
+    window.speechSynthesis.speak(utterance);
   };
 
   return (

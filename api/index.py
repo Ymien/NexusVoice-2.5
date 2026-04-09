@@ -81,36 +81,22 @@ async def chat_endpoint(request: ChatRequest):
 
         # 根据不同的模型提供商设定默认的URL和模型名称
         if request.model_provider in preset_models:
-            url = url or "https://ark.cn-beijing.volces.com/api/v3/responses"
+            url = url or "https://ark.cn-beijing.volces.com/api/v3/chat/completions"
             model_name = preset_models[request.model_provider]["name"]
-            
+
             # 从环境变量中读取的Key
             provider_key = preset_models[request.model_provider]["key"]
             if not provider_key:
                 raise HTTPException(status_code=500, detail=f"后端未配置 {request.model_provider} 的 API 密钥环境变量")
-                
+
             # 自动覆盖使用预设的API Key
             request.api_key = provider_key
-            
+
             payload = {
                 "model": model_name,
-                "stream": False,
-                "tools": [
-                    {
-                        "type": "web_search",
-                        "max_keyword": 3
-                    }
-                ],
-                "input": [
-                    {
-                        "role": "user",
-                        "content": [
-                            {
-                                "type": "input_text",
-                                "text": f"【系统要求：你是一个智能语音助手，除非我明确问你时间，否则绝不要主动报告当前的时间、日期或星期！如果我只是对你说“你好”等问候语，请直接回复“你好！有什么我可以帮你的吗？”，绝对不要带上任何关于时间或日期的信息。】\n\n我的话是：{request.message}"
-                            }
-                        ]
-                    }
+                "messages": [
+                    {"role": "system", "content": "你是一个智能语音助手。请用简短、口语化、亲切的语言回答。重要：不要主动播报当前的时间和日期，除非用户明确询问。"},
+                    {"role": "user", "content": request.message}
                 ]
             }
         elif request.model_provider == "custom":
@@ -132,31 +118,22 @@ async def chat_endpoint(request: ChatRequest):
             "Content-Type": "application/json"
         }
         
-        # 使用 httpx 进行异步 HTTP 请求，提升并发性能
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        # 使用 httpx 进行异步 HTTP 请求，提升并发性能，增加超时时间以防止网络异常报错
+        async with httpx.AsyncClient(timeout=60.0) as client:
             response = await client.post(url, headers=headers, json=payload)
-            
+
             if response.status_code != 200:
                 print(f"模型API请求失败: {response.text}")
                 return ChatResponse(reply="", error=f"模型API请求失败, 状态码: {response.status_code}, 错误信息: {response.text}")
-                
+
             data = response.json()
-            reply_text = ""
             
-            # 处理 Volcengine 的 /api/v3/responses 返回格式
-            if request.model_provider in preset_models:
-                for item in data.get("output", []):
-                    if item.get("type") == "message" and item.get("role") == "assistant":
-                        for c in item.get("content", []):
-                            if c.get("type") == "output_text":
-                                reply_text += c.get("text", "")
-            else:
-                # 从OpenAI兼容的响应格式中提取回复文本
-                reply_text = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+            # 由于统一改用了标准的 chat/completions 接口，所有的回复文本提取逻辑都可以统一为标准格式
+            reply_text = data.get("choices", [{}])[0].get("message", {}).get("content", "")
 
             if not reply_text:
                 return ChatResponse(reply="", error="模型返回的数据格式无法解析内容: " + str(data))
-                
+
             return ChatResponse(reply=reply_text)
             
     except httpx.HTTPStatusError as e:

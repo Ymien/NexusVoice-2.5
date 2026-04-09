@@ -105,18 +105,15 @@ const VoiceControl: React.FC = () => {
     // 清除可能卡住的语音队列
     window.speechSynthesis.cancel();
 
-    setTimeout(() => {
-      // 播放视频
-      setPlayingVideo(true);
+    // 播放视频
+    setPlayingVideo(true);
 
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'zh-CN';
-      utterance.volume = 1;
-      utterance.rate = 1;
-      utterance.pitch = 1;
-
-      // 尝试根据设置选择男声或女声
-      const voices = window.speechSynthesis.getVoices();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'zh-CN';
+    
+    // 尝试根据设置选择男声或女声
+    const voices = window.speechSynthesis.getVoices();
+    if (voices && voices.length > 0) {
       const isMale = ttsVoice === 'male';
 
       let preferredVoice = voices.find(v =>
@@ -131,19 +128,19 @@ const VoiceControl: React.FC = () => {
       if (preferredVoice) {
         utterance.voice = preferredVoice;
       }
+    }
 
-      utterance.onend = () => {
-        setPlayingVideo(false);
-      };
+    utterance.onend = () => {
+      setPlayingVideo(false);
+    };
 
-      utterance.onerror = (e) => {
-        console.error('SpeechSynthesis error:', e);
-        setPlayingVideo(false);
-      };
+    utterance.onerror = (e) => {
+      console.error('SpeechSynthesis error:', e);
+      setPlayingVideo(false);
+    };
 
-      (window as any)._currentUtterance = utterance;
-      window.speechSynthesis.speak(utterance);
-    }, 50);
+    (window as any)._currentUtterance = utterance;
+    window.speechSynthesis.speak(utterance);
   };
 
   /**
