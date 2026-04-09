@@ -8,7 +8,7 @@ import { Volume2, Square } from 'lucide-react';
  */
 const ChatPanel: React.FC = () => {
   // 获取全局聊天消息和设置
-  const { messages, setPlayingVideo, ttsVoice } = useStore();
+  const { messages, setVideoPlaying, voiceType } = useStore();
   // 引用聊天容器底部的元素，用于实现自动滚动
   const messagesEndRef = useRef<HTMLDivElement>(null);
   // 记录当前正在朗读的消息 ID
@@ -24,7 +24,7 @@ const ChatPanel: React.FC = () => {
     return () => {
       if (window.speechSynthesis) {
         window.speechSynthesis.cancel();
-        setPlayingVideo(false);
+        setVideoPlaying(false);
       }
     };
   }, []);
@@ -42,14 +42,14 @@ const ChatPanel: React.FC = () => {
     if (speakingId === id) {
       window.speechSynthesis.cancel();
       setSpeakingId(null);
-      setPlayingVideo(false);
+      setVideoPlaying(false);
       return;
     }
 
     // 取消正在播放的其他语音
     window.speechSynthesis.cancel();
 
-    setPlayingVideo(true);
+    setVideoPlaying(true);
     setSpeakingId(id);
 
     const utterance = new SpeechSynthesisUtterance(text);
@@ -57,7 +57,7 @@ const ChatPanel: React.FC = () => {
 
     // 尝试根据设置选择男声或女声
     const voices = window.speechSynthesis.getVoices();
-    const isMale = ttsVoice === 'male';
+    const isMale = voiceType === 'male';
     const preferredVoice = voices.find(v =>
       v.lang.includes('zh') &&
       (isMale ? v.name.toLowerCase().includes('male') || v.name.includes('男') : v.name.toLowerCase().includes('female') || v.name.includes('女'))
@@ -69,12 +69,12 @@ const ChatPanel: React.FC = () => {
 
     utterance.onend = () => {
       setSpeakingId(null);
-      setPlayingVideo(false);
+      setVideoPlaying(false);
     };
 
     utterance.onerror = () => {
       setSpeakingId(null);
-      setPlayingVideo(false);
+      setVideoPlaying(false);
     };
 
     window.speechSynthesis.speak(utterance);
