@@ -50,7 +50,7 @@ const SettingsModal: React.FC = () => {
                 onChange={(e) => setSettings({ modelProvider: e.target.value as any })}
                 className="w-full p-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-zinc-100 focus:ring-2 focus:ring-blue-500 outline-none"
               >
-                <option value="doubao">豆包</option>
+                <option value="glm">GLM-4</option>
                 <option value="deepseek">DeepSeek</option>
                 <option value="kimi">Kimi</option>
                 <option value="custom">自定义 (其他)</option>

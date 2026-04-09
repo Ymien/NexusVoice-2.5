@@ -22,8 +22,8 @@ interface AppState {
   initialReply: string;      // 唤醒后的首次回复，例如 "我在呢"
   ttsVoice: 'male' | 'female'; // TTS发音人性别
   videoUrl: string;          // 同步播放的视频地址
-  modelProvider: 'doubao' | 'deepseek' | 'kimi' | 'custom'; // 使用的LLM提供商
-  setModelProvider: (provider: 'doubao' | 'deepseek' | 'kimi' | 'custom') => void;
+  modelProvider: 'glm' | 'deepseek' | 'kimi' | 'custom';
+  setModelProvider: (provider: 'glm' | 'deepseek' | 'kimi' | 'custom') => void;
   apiKey: string;            // LLM的API Key
   customApiUrl: string;      // 自定义API地址
   
@@ -65,7 +65,7 @@ export const useStore = create<AppState>()(
       initialReply: '我在呢，请问有什么可以帮您？',
       ttsVoice: 'female',
       videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4', // 默认占位视频
-      modelProvider: 'doubao',
+      modelProvider: 'glm',
       setModelProvider: (provider) => set({ modelProvider: provider }),
       apiKey: '', // 前端不再存储默认的 API Key，后端直接使用字典映射
       customApiUrl: '',

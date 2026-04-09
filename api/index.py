@@ -24,7 +24,7 @@ class ChatRequest(BaseModel):
     定义从客户端接收的聊天请求结构
     """
     message: str              # 用户的语音转文字结果或直接输入的文本
-    model_provider: str       # 指定使用的大模型提供商 ('doubao', 'deepseek', 'kimi', 'custom')
+    model_provider: str       # 指定使用的大模型提供商 ('glm', 'deepseek', 'kimi', 'custom')
     api_key: str              # 用于认证的API密钥
     api_url: Optional[str] = "" # 接口地址（对于自定义模型或者特定端点的大模型必须提供）
 
@@ -59,8 +59,8 @@ async def chat_endpoint(request: ChatRequest):
         
         # 预设模型的映射表 (名称和各自的API KEY)
         preset_models = {
-            "doubao": {
-                "name": "ep-20250212002344-9p47d",
+            "glm": {
+                "name": "glm-4-7-251222",
                 "key": "3ffbc74e-841a-47e6-b63e-7c77d69e0008"
             },
             "deepseek": {
