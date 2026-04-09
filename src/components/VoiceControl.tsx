@@ -177,9 +177,11 @@ const VoiceControl: React.FC = () => {
         custom_model_name: customModelName
       };
 
-      // 如果在桌面客户端 (file://) 中运行，则使用你部署在云端的 Vercel 后端地址；否则使用相对路径
-      const isDesktop = window.location.protocol === 'file:';
-      const apiUrl = isDesktop ? 'https://nexusvoice-2-5.vercel.app/api/chat' : '/api/chat';
+      // 如果在桌面客户端 (file://) 或 移动端应用 (capacitor:// / http://localhost) 中运行，则使用云端 Vercel 后端地址
+      const isDesktopOrApp = window.location.protocol === 'file:' || 
+                             window.location.protocol === 'capacitor:' || 
+                             window.location.hostname === 'localhost';
+      const apiUrl = isDesktopOrApp ? 'https://nexusvoice-2-5.vercel.app/api/chat' : '/api/chat';
 
       // 发起请求
       const response = await fetch(apiUrl, {

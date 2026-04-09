@@ -1,5 +1,15 @@
 # 更新日志 (Changelog)
 
+## [v0.5.0] - 2026-04-09
+### 新增特性 (Features)
+- 📱 **新增 Android (.apk) 打包支持**: 移除了多余的 macOS 苹果端打包支持，正式加入基于 Capacitor 的原生安卓打包构建环境，现在每次发布将同时提供 Windows `.exe` 和 Android `.apk` 文件。
+
+### 修复与优化 (Fixes)
+- 🐛 **修复白屏报错**: 修复了由于 `lucide-react` 图标 (`Mic2`) 未正确引入导致的页面直接白屏奔溃问题。
+- 🔧 **网络适配增强**: 优化了网络请求路由的检测逻辑，自动识别 Capacitor 移动端环境并将请求指向 Vercel 云端后端，确保移动端 API 请求正常工作。
+
+---
+
 ## [v0.4.75] - 2026-04-09
 ### 修复与优化 (Fixes)
 - 🐛 **修复 Action 构建凭证报错 (HTTP 401)**: 彻底解决了在 GitHub Actions 流水线中的 `Bad credentials` 错误。

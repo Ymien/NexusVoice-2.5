@@ -6,7 +6,7 @@ import SettingsModal from '../components/SettingsModal';
 import AuthModal from '../components/AuthModal';
 import { useStore } from '../store/useStore';
 import { supabase } from '../lib/supabase';
-import { Settings, LogOut, User, Sparkles, LayoutDashboard } from 'lucide-react';
+import { Settings, LogOut, User, Sparkles, LayoutDashboard, Mic2 } from 'lucide-react';
 
 export default function Home() {
   const setSettingsOpen = useStore((state) => state.setSettingsOpen);
