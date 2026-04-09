@@ -2,7 +2,7 @@
 
 English | [简体中文](./README.md)
 
-![Version](https://img.shields.io/badge/version-v0.8.0-blue.svg)
+![Version](https://img.shields.io/badge/version-v0.13.0-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Android%20%7C%20Web-success.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
@@ -22,7 +22,7 @@ English | [简体中文](./README.md)
 - **J.A.R.V.I.S. Visual Monitoring**: Features a built-in, highly sci-fi **fluid network particle video background**. When on standby or when the AI speaks, it dynamically triggers vibrant dopamine halos and breathing light effects, maximizing the visual experience.
 
 ### 🎨 Colorful Themes & Defense Mechanisms
-- **Dopamine Adaptations**: Silky-smooth switching among multiple exquisite themes including `Light`, `Dark`, `Neon Cyber`, `Pastel Macaron`, and `Sunset Horizon`.
+- **Theme Adaptations**: Silky-smooth switching among multiple exquisite themes including `Light`, `Dark`, `Neon Cyber`, `Pastel Macaron`, and `Sunset Horizon`.
 - **Forced Instruction Defense**: Built-in powerful system defenses intelligently block the model from generating redundant hallucinations like "randomly broadcasting the current time", ensuring pure and natural conversations.
 
 ---

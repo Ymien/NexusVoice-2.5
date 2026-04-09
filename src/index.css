@@ -21,7 +21,7 @@
     --accent-glow: rgba(139, 92, 246, 0.15);
   }
 
-  .theme-dopamine-neon {
+  .theme-neon-cyber {
     --bg-primary: #0a0a1a;
     --bg-panel: #14142b;
     --text-primary: #00ffff;
@@ -30,7 +30,7 @@
     --accent-glow: rgba(0, 255, 255, 0.3);
   }
 
-  .theme-dopamine-macaron {
+  .theme-pastel-macaron {
     --bg-primary: #fff0f5;
     --bg-panel: #ffffff;
     --text-primary: #5c4b51;
@@ -39,7 +39,7 @@
     --accent-glow: rgba(255, 183, 178, 0.4);
   }
 
-  .theme-dopamine-sunset {
+  .theme-sunset-horizon {
     --bg-primary: #fff3e0;
     --bg-panel: #ffffff;
     --text-primary: #4a1c40;
