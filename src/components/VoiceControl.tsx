@@ -211,12 +211,15 @@ const VoiceControl: React.FC = () => {
 
     } catch (error: any) {
       console.error('发送消息失败:', error);
+      const errorMsg = `抱歉，发生了错误: ${error.message}`;
       addMessage({
         id: (Date.now() + 1).toString(),
         role: 'ai',
-        content: `抱歉，发生了错误: ${error.message}`,
+        content: errorMsg,
         timestamp: Date.now() + 1
       });
+      // 错误时也通过 TTS 播报
+      speakText(errorMsg);
     }
   };
 
