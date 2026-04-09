@@ -12,17 +12,17 @@ jobs:
   release:
     runs-on: ${{ matrix.os }}
     permissions:
-      contents: write # 赋予全局写权限，允许创建 Release 和上传 Assets
+      contents: write # 必须：允许创建 Release 和上传 Assets
     strategy:
       matrix:
         os: [windows-latest, macos-latest] # 移除 linux 以加快构建速度
 
     steps:
       - name: Check out Git repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4 # 升级为 v4
 
       - name: Install Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4 # 升级为 v4
         with:
           node-version: 18
 
@@ -37,3 +37,5 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           release: true
+          mac_certs: ${{ secrets.MAC_CERTS }}
+          mac_certs_password: ${{ secrets.MAC_CERTS_PASSWORD }}
