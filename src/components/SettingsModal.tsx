@@ -52,7 +52,7 @@ const SettingsModal: React.FC = () => {
               >
                 <option value="glm">GLM-4</option>
                 <option value="deepseek">DeepSeek</option>
-                <option value="doubao">豆包 (Doubao-1.5-pro)</option>
+                <option value="doubao">豆包</option>
                 <option value="custom">自定义 (其他)</option>
               </select>
             </div>

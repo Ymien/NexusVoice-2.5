@@ -69,11 +69,11 @@ async def chat_endpoint(request: ChatRequest):
                 "key": os.environ.get("VITE_GLM_API_KEY", "")
             },
             "deepseek": {
-                "name": "deepseek-v3-1-terminus",
+                "name": "ep-20260409153659-fbgz8",
                 "key": os.environ.get("VITE_DEEPSEEK_API_KEY", "")
             },
             "doubao": {
-                "name": "ep-20250212002344-9p47d",
+                "name": "ep-20260409153917-z4nx8",
                 "key": os.environ.get("VITE_DOUBAO_API_KEY", "")
             }
         }
