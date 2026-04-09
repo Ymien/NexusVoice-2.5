@@ -58,18 +58,23 @@ async def chat_endpoint(request: ChatRequest):
         model_name = "default-model"
         
         # 预设模型的映射表 (名称和各自的API KEY)
+        # 为了安全，这里不硬编码 API Key，而是从环境变量中读取。
+        # 请在你的部署环境（如 Vercel -> Settings -> Environment Variables）中设置以下变量：
+        # - VITE_GLM_API_KEY
+        # - VITE_DEEPSEEK_API_KEY
+        # - VITE_KIMI_API_KEY
         preset_models = {
             "glm": {
                 "name": "glm-4-7-251222",
-                "key": "3ffbc74e-841a-47e6-b63e-7c77d69e0008"
+                "key": os.environ.get("VITE_GLM_API_KEY", "")
             },
             "deepseek": {
                 "name": "deepseek-v3-1-terminus",
-                "key": "135c9178-d814-41fe-8f8f-c3e738897640"
+                "key": os.environ.get("VITE_DEEPSEEK_API_KEY", "")
             },
             "kimi": {
                 "name": "kimi-k2-thinking-251104",
-                "key": "7fb361cc-cf98-4902-9a81-48eaac9e61f2"
+                "key": os.environ.get("VITE_KIMI_API_KEY", "")
             }
         }
 
@@ -77,8 +82,14 @@ async def chat_endpoint(request: ChatRequest):
         if request.model_provider in preset_models:
             url = url or "https://ark.cn-beijing.volces.com/api/v3/responses"
             model_name = preset_models[request.model_provider]["name"]
+            
+            # 从环境变量中读取的Key
+            provider_key = preset_models[request.model_provider]["key"]
+            if not provider_key:
+                raise HTTPException(status_code=500, detail=f"后端未配置 {request.model_provider} 的 API 密钥环境变量")
+                
             # 自动覆盖使用预设的API Key
-            request.api_key = preset_models[request.model_provider]["key"]
+            request.api_key = provider_key
             
             payload = {
                 "model": model_name,
