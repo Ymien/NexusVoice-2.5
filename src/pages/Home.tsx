@@ -91,11 +91,11 @@ export default function Home() {
       </header>
 
       {/* 主要内容区域 */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col min-h-[calc(100vh-5rem)]">
-        <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 flex-1 min-h-0">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col h-auto md:h-[calc(100vh-5rem)]">
+        <div className="flex flex-col md:flex-row gap-4 sm:gap-6 flex-1 min-h-0 md:h-full">
           {/* 左侧：视频播放区域 */}
-          <div className="w-full lg:w-1/2 flex flex-col gap-4 sm:gap-6 min-h-0">
-            <div className="w-full aspect-video sm:aspect-auto lg:flex-1 rounded-2xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-800 bg-black min-h-[250px]">
+          <div className="w-full md:w-1/2 flex flex-col gap-4 sm:gap-6 min-h-0 md:h-full">
+            <div className="w-full aspect-video md:aspect-auto md:flex-1 rounded-2xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-800 bg-black min-h-[250px]">
               <VideoPlayer />
             </div>
             <div className="shrink-0">
@@ -104,7 +104,7 @@ export default function Home() {
           </div>
 
           {/* 右侧：聊天记录区域 */}
-          <div className="w-full lg:w-1/2 h-[500px] lg:h-auto lg:flex-1 min-h-[400px]">
+          <div className="w-full md:w-1/2 h-[500px] md:h-full min-h-[400px] md:min-h-0">
             <ChatPanel />
           </div>
         </div>

@@ -8,7 +8,7 @@ import { Volume2, Square } from 'lucide-react';
  */
 const ChatPanel: React.FC = () => {
   // 获取全局聊天消息和设置
-  const { messages, setVideoPlaying, voiceType } = useStore();
+  const { messages, setPlayingVideo, ttsVoice } = useStore();
   // 引用聊天容器底部的元素，用于实现自动滚动
   const messagesEndRef = useRef<HTMLDivElement>(null);
   // 记录当前正在朗读的消息 ID
@@ -24,7 +24,7 @@ const ChatPanel: React.FC = () => {
     return () => {
       if (window.speechSynthesis) {
         window.speechSynthesis.cancel();
-        setVideoPlaying(false);
+        setPlayingVideo(false);
       }
     };
   }, []);
@@ -42,14 +42,14 @@ const ChatPanel: React.FC = () => {
     if (speakingId === id) {
       window.speechSynthesis.cancel();
       setSpeakingId(null);
-      setVideoPlaying(false);
+      setPlayingVideo(false);
       return;
     }
 
     // 取消正在播放的其他语音
     window.speechSynthesis.cancel();
 
-    setVideoPlaying(true);
+    setPlayingVideo(true);
     setSpeakingId(id);
 
     const utterance = new SpeechSynthesisUtterance(text);
@@ -57,7 +57,7 @@ const ChatPanel: React.FC = () => {
 
     // 尝试根据设置选择男声或女声
     const voices = window.speechSynthesis.getVoices();
-    const isMale = voiceType === 'male';
+    const isMale = ttsVoice === 'male';
     const preferredVoice = voices.find(v =>
       v.lang.includes('zh') &&
       (isMale ? v.name.toLowerCase().includes('male') || v.name.includes('男') : v.name.toLowerCase().includes('female') || v.name.includes('女'))
@@ -69,12 +69,12 @@ const ChatPanel: React.FC = () => {
 
     utterance.onend = () => {
       setSpeakingId(null);
-      setVideoPlaying(false);
+      setPlayingVideo(false);
     };
 
     utterance.onerror = () => {
       setSpeakingId(null);
-      setVideoPlaying(false);
+      setPlayingVideo(false);
     };
 
     window.speechSynthesis.speak(utterance);
@@ -107,7 +107,7 @@ const ChatPanel: React.FC = () => {
                 </div>
                 
                 {/* 针对 AI 消息提供操作按钮：语音播报 */}
-                {msg.role === 'assistant' && (
+                {msg.role === 'ai' && (
                   <div className="flex items-center gap-2 mt-1 px-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                       onClick={() => handleSpeak(msg.id, msg.content)}
