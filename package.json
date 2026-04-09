@@ -11,8 +11,8 @@
     "preview": "vite preview",
     "electron:dev": "concurrently -k \"cross-env BROWSER=none npm run dev\" \"npm run electron:start\"",
     "electron:start": "wait-on http://localhost:5173 && electron .",
-    "electron:build": "vite build && electron-builder"
-  },  "check": "tsc -b --noEmit"
+    "electron:build": "vite build && electron-builder",
+    "check": "tsc -b --noEmit"
   },
   "build": {
     "appId": "com.nexusvoice.app",
@@ -55,6 +55,11 @@
     "zustand": "^5.0.12"
   },
   "devDependencies": {
+    "electron": "^34.0.0",
+    "electron-builder": "^25.1.8",
+    "concurrently": "^9.1.0",
+    "cross-env": "^7.0.3",
+    "wait-on": "^8.0.1",
     "@eslint/js": "^9.25.0",
     "@types/node": "^22.15.30",
     "@types/react": "^18.3.12",
