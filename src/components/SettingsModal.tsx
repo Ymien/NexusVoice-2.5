@@ -168,17 +168,6 @@ const SettingsModal: React.FC = () => {
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm text-main">首次唤醒回复</label>
-              <input
-                type="text"
-                value={initialReply}
-                onChange={(e) => setSettings({ initialReply: e.target.value })}
-                placeholder="例如: 我在呢"
-                className="w-full p-2.5 rounded-lg border border-border bg-base text-main focus:ring-2 focus:ring-primary outline-none"
-              />
-            </div>
-
-            <div className="flex flex-col gap-1.5">
               <label className="text-sm text-main">TTS 音色</label>
               <select
                 value={ttsVoice}
