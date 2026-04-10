@@ -24,6 +24,8 @@ const VoiceControl: React.FC = () => {
     modelProvider,
     apiKey,
     customApiUrl,
+    customModelName,
+    systemPrompt,
     isListening,
     setListening,
     addMessage,
@@ -217,7 +219,8 @@ const VoiceControl: React.FC = () => {
           model_provider: modelProvider,
           api_key: apiKey || "", // 允许前端不传，由后端 fallback 读取环境变量
           api_url: customApiUrl || "",
-          custom_model_name: ""
+          custom_model_name: customModelName || "",
+          system_prompt: systemPrompt || ""
         }),
         signal: ctrl.signal
       });
@@ -312,7 +315,7 @@ const VoiceControl: React.FC = () => {
 
   return (
 
-    <div className="w-full flex flex-col relative bg-panel border-t border-border shadow-panel">
+    <div className="w-full flex flex-col relative bg-panel border border-border shadow-lg rounded-[2rem] overflow-hidden">
       {/* 动态交互动作栏 */}
       {(messages.length > 0 || isGenerating) && (
         <div className="flex items-center justify-center gap-3 px-4 pt-3 pb-1">
@@ -369,8 +372,8 @@ const VoiceControl: React.FC = () => {
             handleSend();
           }
         }}
-        placeholder="说出唤醒词或手动输入..."
-        className="flex-1 p-3 bg-base border-border border-none rounded-xl text-main focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+        placeholder={t("voice.placeholder")}
+        className="flex-1 p-3 bg-base border-border border-none rounded-xl text-main focus:ring-2 focus:ring-primary outline-none transition-all"
       />
 
             {/* 发送按钮 */}

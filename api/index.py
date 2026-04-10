@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import httpx
 
-app = FastAPI(title="语音聊天系统后端 (Voice Chat System Backend)")
+app = FastAPI(title="NexusVoice Core API")
 
 # 配置CORS，允许前端应用和C++终端跨域请求
 # 这是一个必要的安全机制，允许浏览器从不同端口或域名向此后端发起请求
@@ -26,8 +26,9 @@ class ChatRequest(BaseModel):
     message: str              # 用户的语音转文字结果或直接输入的文本
     model_provider: str       # 指定使用的大模型提供商 ('glm', 'deepseek', 'doubao', 'custom')
     api_key: str              # 用于认证的API密钥
-    api_url: Optional[str] = "" # 接口地址（对于自定义模型或者特定端点的大模型必须提供）
-    custom_model_name: Optional[str] = "" # 自定义模型名称
+    api_url: Optional[str] = ""
+    custom_model_name: Optional[str] = ""
+    system_prompt: Optional[str] = "你是一个智能语音助手。请用简短、口语化、亲切的语言回答。重要：不要主动播报当前的时间和日期，除非用户明确询问。" 
 
 class ChatResponse(BaseModel):
     """
@@ -86,16 +87,19 @@ async def chat_endpoint(request: ChatRequest):
 
             # 从环境变量中读取的Key
             provider_key = preset_models[request.model_provider]["key"]
-            if not provider_key:
-                raise HTTPException(status_code=500, detail=f"后端未配置 {request.model_provider} 的 API 密钥环境变量")
+            
+            # 如果环境变量有配置，优先使用环境变量；否则使用前端传来的Key
+            if provider_key:
+                request.api_key = provider_key
+            
+            if not request.api_key:
+                raise HTTPException(status_code=400, detail=f"未提供 {request.model_provider} 的 API 密钥（请在前端配置或在后端设置环境变量）")
 
-            # 自动覆盖使用预设的API Key
-            request.api_key = provider_key
-
+            sys_prompt = request.system_prompt if request.system_prompt else "你是一个智能语音助手。请用简短、口语化、亲切的语言回答。"
             payload = {
                 "model": model_name,
                 "messages": [
-                    {"role": "system", "content": "你是一个智能语音助手。请用简短、口语化、亲切的语言回答。重要：不要主动播报当前的时间和日期，除非用户明确询问。"},
+                    {"role": "system", "content": sys_prompt},
                     {"role": "user", "content": request.message}
                 ]
             }
@@ -103,10 +107,11 @@ async def chat_endpoint(request: ChatRequest):
             if not url:
                 raise HTTPException(status_code=400, detail="自定义模型必须提供 api_url")
             model_name = request.custom_model_name or "gpt-3.5-turbo"
+            sys_prompt = request.system_prompt if request.system_prompt else "你是一个有用的语音助手。请用简短、口语化的语言回答。"
             payload = {
                 "model": model_name,
                 "messages": [
-                    {"role": "system", "content": "你是一个有用的语音助手。请用简短、口语化的语言回答，因为你的回答将被转换为语音播报。"},
+                    {"role": "system", "content": sys_prompt},
                     {"role": "user", "content": request.message}
                 ]
             }

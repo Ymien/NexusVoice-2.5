@@ -20,6 +20,8 @@ const SettingsModal: React.FC = () => {
     modelProvider,
     apiKey,
     customApiUrl,
+    customModelName,
+    systemPrompt,
     setSettings,
     theme,
     setTheme
@@ -30,7 +32,7 @@ const SettingsModal: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity">
-      <div className="bg-panel border-panel border border-border shadow-panel w-[90%] max-w-lg rounded-3xl shadow-2xl p-6 relative flex flex-col max-h-[90vh]">
+      <div className="bg-panel border-panel border border-border shadow-panel w-[90%] max-w-2xl rounded-3xl shadow-2xl p-6 relative flex flex-col max-h-[90vh]">
         {/* 关闭按钮 */}
         <button
           onClick={() => setSettingsOpen(false)}
@@ -86,7 +88,7 @@ const SettingsModal: React.FC = () => {
               <select
                 value={modelProvider}
                 onChange={(e) => setSettings({ modelProvider: e.target.value })}
-                className="w-full p-2.5 rounded-lg border border-border border bg-base text-main focus:ring-2 focus:ring-primary outline-none"
+                className="w-full p-2.5 rounded-lg border border-border bg-base text-main focus:ring-2 focus:ring-primary outline-none"
               >
                 <option value="deepseek">DeepSeek</option>
                 <option value="doubao">豆包 (Doubao)</option>
@@ -102,7 +104,7 @@ const SettingsModal: React.FC = () => {
                 value={apiKey}
                 onChange={(e) => setSettings({ apiKey: e.target.value })}
                 placeholder="请输入 API 密钥"
-                className="w-full p-2.5 rounded-lg border border-border border bg-base text-main focus:ring-2 focus:ring-primary outline-none"
+                className="w-full p-2.5 rounded-lg border border-border bg-base text-main focus:ring-2 focus:ring-primary outline-none"
               />
             </div>
 
@@ -114,7 +116,7 @@ const SettingsModal: React.FC = () => {
                   value={customApiUrl}
                   onChange={(e) => setSettings({ customApiUrl: e.target.value })}
                   placeholder="例如: https://your-custom-api.com/v1/chat/completions"
-                  className="w-full p-2.5 rounded-lg border border-border border bg-base text-main focus:ring-2 focus:ring-primary outline-none"
+                  className="w-full p-2.5 rounded-lg border border-border bg-base text-main focus:ring-2 focus:ring-primary outline-none"
                 />
               </div>
             )}
@@ -133,7 +135,7 @@ const SettingsModal: React.FC = () => {
                 value={wakeWord}
                 onChange={(e) => setSettings({ wakeWord: e.target.value })}
                 placeholder="例如: 小艾"
-                className="w-full p-2.5 rounded-lg border border-border border bg-base text-main focus:ring-2 focus:ring-primary outline-none"
+                className="w-full p-2.5 rounded-lg border border-border bg-base text-main focus:ring-2 focus:ring-primary outline-none"
               />
             </div>
 
@@ -144,7 +146,7 @@ const SettingsModal: React.FC = () => {
                 value={initialReply}
                 onChange={(e) => setSettings({ initialReply: e.target.value })}
                 placeholder="例如: 我在呢"
-                className="w-full p-2.5 rounded-lg border border-border border bg-base text-main focus:ring-2 focus:ring-primary outline-none"
+                className="w-full p-2.5 rounded-lg border border-border bg-base text-main focus:ring-2 focus:ring-primary outline-none"
               />
             </div>
 
@@ -153,7 +155,7 @@ const SettingsModal: React.FC = () => {
               <select
                 value={ttsVoice}
                 onChange={(e) => setSettings({ ttsVoice: e.target.value as 'male' | 'female' })}
-                className="w-full p-2.5 rounded-lg border border-border border bg-base text-main focus:ring-2 focus:ring-primary outline-none"
+                className="w-full p-2.5 rounded-lg border border-border bg-base text-main focus:ring-2 focus:ring-primary outline-none"
               >
                 <option value="female">{t('settings.female')}</option>
                 <option value="male">{t('settings.male')}</option>
@@ -167,7 +169,7 @@ const SettingsModal: React.FC = () => {
                 value={videoUrl}
                 onChange={(e) => setSettings({ videoUrl: e.target.value })}
                 placeholder="输入MP4等视频地址"
-                className="w-full p-2.5 rounded-lg border border-border border bg-base text-main focus:ring-2 focus:ring-primary outline-none"
+                className="w-full p-2.5 rounded-lg border border-border bg-base text-main focus:ring-2 focus:ring-primary outline-none"
               />
             </div>
           </div>

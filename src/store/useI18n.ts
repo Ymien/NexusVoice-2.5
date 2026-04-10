@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 
 const en = {
   app: {
-    title: "NexusVoice | Intelligent Voice Assistant",
+    title: "NexusVoice Core",
     login: "Login",
     settings: "Settings",
     startRecord: "Start Recording",
@@ -35,6 +35,9 @@ const en = {
     modelConfig: "Model Configuration",
     customModel: "Custom (Other)",
     apiKey: "API Key",
+    defaultKeyNote: "Using backend configured API key. No manual input required.",
+    customModelName: "Custom Model Name",
+    systemPrompt: "System Prompt",
     voiceVideoConfig: "Voice & Video Configuration",
     wakeWord: "Wake Word",
     initialReply: "Initial Reply",
@@ -48,7 +51,7 @@ const en = {
 
 const zh = {
   app: {
-    title: "NexusVoice | 智能多模态语音助手",
+    title: "NexusVoice Core",
     login: "登录账户",
     settings: "系统设置",
     startRecord: "开始录音",
@@ -80,6 +83,9 @@ const zh = {
     modelConfig: "大模型配置",
     customModel: "自定义 (其他)",
     apiKey: "API Key",
+    defaultKeyNote: "已使用后端环境变量配置的密钥，无需手动输入。",
+    customModelName: "自定义模型名称",
+    systemPrompt: "系统提示词 (System Prompt)",
     voiceVideoConfig: "语音与视频配置",
     wakeWord: "唤醒词",
     initialReply: "初始回复",

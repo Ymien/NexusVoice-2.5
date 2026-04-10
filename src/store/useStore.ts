@@ -17,9 +17,11 @@ interface AppState {
   initialReply: string;      // 唤醒后的首次回复，例如 "我在呢"
   ttsVoice: 'male' | 'female'; // TTS发音人性别
   videoUrl: string;          // 同步播放的视频地址
-  modelProvider: string;     // 使用的LLM提供商，如 doubao, deepseek, xiaomi, custom
+  modelProvider: string;     // 使用的LLM提供商，如 doubao, deepseek, glm, custom
   apiKey: string;            // LLM的API Key
   customApiUrl: string;      // 自定义API地址
+  customModelName: string;   // 用户自定义的大模型名称
+  systemPrompt: string;      // 用户自定义的系统提示词
   
   // 运行时的应用状态
   messages: Message[];       // 聊天记录数组
@@ -58,6 +60,8 @@ export const useStore = create<AppState>()(
       modelProvider: 'deepseek',
       apiKey: '',
       customApiUrl: '',
+      customModelName: 'gpt-4o',
+      systemPrompt: '你是一个贴心的助手，请用简短、自然的中文口语回答。',
 
       // 默认运行时状态
       messages: [],
@@ -100,6 +104,8 @@ export const useStore = create<AppState>()(
         modelProvider: state.modelProvider,
         apiKey: state.apiKey,
         customApiUrl: state.customApiUrl,
+        customModelName: state.customModelName,
+        systemPrompt: state.systemPrompt,
       }),
     }
   )

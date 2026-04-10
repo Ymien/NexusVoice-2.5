@@ -19,7 +19,7 @@ const ChatPanel: React.FC = () => {
   }, [messages]);
 
   return (
-    <div className="flex flex-col h-full w-full bg-base rounded-panel shadow-inner p-4 overflow-hidden border border-border">
+    <div className="flex flex-col h-full w-full h-full w-full bg-transparent flex flex-col p-4 overflow-hidden">
       <div className="flex-1 overflow-y-auto space-y-4 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-zinc-700">
         {messages.length === 0 ? (
           // 当没有聊天记录时显示的占位提示

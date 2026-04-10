@@ -4,48 +4,61 @@ import VideoPlayer from '../components/VideoPlayer';
 import ChatPanel from '../components/ChatPanel';
 import VoiceControl from '../components/VoiceControl';
 import SettingsModal from '../components/SettingsModal';
-import { Bot } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
-/**
- * 主页组件
- * 功能：系统的主界面，整合了视频播放区、聊天面板和语音控制面板
- */
 const Home: React.FC = () => {
   const { t } = useI18n();
   return (
-    <div className="min-h-screen bg-base p-4 md:p-8 flex flex-col items-center">
-      {/* 顶部标题栏 */}
-      <header className="w-full max-w-6xl mb-6 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="p-3 bg-primary rounded-btn rounded-2xl shadow-lg">
-            <Bot size={32} className="text-white" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-main">AI 虚拟助手</h1>
-            <p className="text-sm text-muted">支持语音唤醒与音视频同步</p>
-          </div>
-        </div>
-      </header>
-
-      {/* 主体内容区：响应式布局，桌面端左右分栏，移动端上下堆叠 */}
-      <main className="w-full max-w-6xl flex-1 flex flex-col lg:flex-row gap-6 h-[calc(100vh-140px)]">
+    <div className="h-screen w-full bg-base flex flex-col items-center justify-center p-4 md:p-6 lg:p-8 overflow-hidden">
+      
+      {/* 桌面端：卡片式应用程序布局 */}
+      <div className="w-full max-w-[1400px] h-full max-h-[900px] bg-panel border border-border shadow-panel rounded-panel flex flex-col overflow-hidden relative">
         
-        {/* 左侧：视频播放展示区 */}
-        <section className="flex-1 lg:flex-[1.2] h-64 lg:h-full min-h-[300px] rounded-panel overflow-hidden shadow-xl border border-border relative">
-          <VideoPlayer />
-        </section>
-
-        {/* 右侧：聊天记录与控制面板区 */}
-        <section className="flex-1 lg:flex-[0.8] flex flex-col h-full bg-panel border border-border shadow-panel rounded-panel rounded-panel shadow-xl border border-border">
-          <div className="flex-1 p-4 overflow-hidden">
-            <ChatPanel />
+        {/* 极简顶栏 */}
+        <header className="h-16 border-b border-border flex items-center justify-between px-6 shrink-0 bg-base/50 backdrop-blur-md z-10">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-md">
+              <Sparkles size={16} className="text-on-primary" />
+            </div>
+            <h1 className="text-xl font-bold tracking-tight text-main">{t('app.title')}</h1>
           </div>
-          <VoiceControl />
-        </section>
+          <div className="text-xs font-medium text-muted bg-base px-3 py-1 rounded-full border border-border">
+            v2.5.0
+          </div>
+        </header>
 
-      </main>
+        {/* 核心内容区 */}
+        <main className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+          
+          {/* 左侧：视频/视觉中心 */}
+          <section className="flex-1 lg:flex-[1.3] relative bg-black/5 flex items-center justify-center overflow-hidden border-b lg:border-b-0 lg:border-r border-border min-h-[30vh]">
+            <div className="absolute inset-0 w-full h-full p-4 lg:p-6">
+              <div className="w-full h-full rounded-2xl overflow-hidden shadow-2xl border border-border/50 bg-black relative group">
+                <VideoPlayer />
+                {/* 装饰性光效 */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent pointer-events-none opacity-50 mix-blend-overlay"></div>
+              </div>
+            </div>
+          </section>
 
-      {/* 浮动设置弹窗 */}
+          {/* 右侧：交互区 */}
+          <section className="flex-1 lg:flex-[0.9] xl:flex-[0.8] flex flex-col h-full bg-panel relative z-10">
+            {/* 聊天记录区 */}
+            <div className="flex-1 overflow-hidden p-4 lg:p-6 pb-0">
+              <div className="h-full rounded-2xl overflow-hidden border border-border shadow-inner bg-base/30">
+                <ChatPanel />
+              </div>
+            </div>
+            
+            {/* 底部控制区 */}
+            <div className="p-4 lg:p-6 pt-4 shrink-0">
+              <VoiceControl />
+            </div>
+          </section>
+          
+        </main>
+      </div>
+
       <SettingsModal />
     </div>
   );
