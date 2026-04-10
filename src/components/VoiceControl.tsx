@@ -173,19 +173,15 @@ const VoiceControl: React.FC = () => {
 
     // 加入小延迟执行 speak() 解决 Chrome PC 端的 Bug
     setTimeout(() => {
-      window.speechSynthesis.speak(utterance);
-      
-      // Chrome 垃圾回收导致的 TTS 中断 Bug 的终极修复方案
-      // 定期唤醒引擎直到播报结束
-      const resumeInfinity = () => {
+      window.speechSynthesis.speak(utterance);      // 移除导致声音鬼畜和中断的 pause/resume 轮询 Hack
+      // 改用仅查询 speaking 状态的方法来维持引擎活跃
+      const intervalId = setInterval(() => {
         if (!window.speechSynthesis.speaking) {
           clearInterval(intervalId);
-          return;
+        } else {
+          console.debug('Keeping TTS engine alive...');
         }
-        window.speechSynthesis.pause();
-        window.speechSynthesis.resume();
-      };
-      const intervalId = setInterval(resumeInfinity, 5000);
+      }, 5000);
       
       // 当播报彻底结束或出错时，清除定时器
       const cleanup = () => clearInterval(intervalId);
