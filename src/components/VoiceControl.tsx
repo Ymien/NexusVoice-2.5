@@ -114,7 +114,8 @@ const VoiceControl: React.FC = () => {
     setPlayingVideo(true);
 
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'zh-CN';
+    const targetLang = lang === 'en' ? 'en-US' : 'zh-CN';
+    utterance.lang = targetLang;
     utterance.rate = 1.0;
     utterance.pitch = 1.0;
     utterance.volume = 1.0;
@@ -125,14 +126,14 @@ const VoiceControl: React.FC = () => {
     if (voices.length === 0) {
       window.speechSynthesis.onvoiceschanged = () => {
         voices = window.speechSynthesis.getVoices();
-        setVoiceAndSpeak(utterance, voices);
+        setVoiceAndSpeak(utterance, voices, targetLang);
       };
     } else {
-      setVoiceAndSpeak(utterance, voices);
+      setVoiceAndSpeak(utterance, voices, targetLang);
     }
   };
 
-  const setVoiceAndSpeak = (utterance: SpeechSynthesisUtterance, voices: SpeechSynthesisVoice[]) => {
+  const setVoiceAndSpeak = (utterance: SpeechSynthesisUtterance, voices: SpeechSynthesisVoice[], targetLang: string) => {
     const isMale = ttsVoice === 'male';
     
     // 优先选择微软的高质量自然神经网络语音（Natural / Online / Xiaoxiao / Yunxi 等），这些语音极像真人
