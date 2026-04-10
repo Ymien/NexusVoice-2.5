@@ -1,3 +1,4 @@
+import { useI18n } from '../store/useI18n';
 import React, { useState, useEffect, useRef } from 'react';
 import { useStore } from '../store/useStore';
 import { Mic, MicOff, Settings, Send } from 'lucide-react';
@@ -15,6 +16,7 @@ declare global {
  * 功能：处理语音唤醒、录音转文字、调用后端大模型、以及文字转语音播报
  */
 const VoiceControl: React.FC = () => {
+  const { t } = useI18n();
   const {
     wakeWord,
     initialReply,
@@ -22,31 +24,18 @@ const VoiceControl: React.FC = () => {
     modelProvider,
     apiKey,
     customApiUrl,
-    customModelName,
-    isPlayingVideo,
-    setPlayingVideo,
-    messages,
+    isListening,
+    setListening,
     addMessage,
-    clearMessages,
-    isSettingsOpen,
+    setPlayingVideo,
     setSettingsOpen
   } = useStore();
 
   const [textInput, setTextInput] = useState('');
-  const [isListening, setListening] = useState(false);
   const recognitionRef = useRef<any>(null);
-
 
   // 初始化语音识别对象
   useEffect(() => {
-    // 强制触发一次 voices 的加载
-    if (window.speechSynthesis) {
-      window.speechSynthesis.getVoices();
-      window.speechSynthesis.onvoiceschanged = () => {
-        window.speechSynthesis.getVoices();
-      };
-    }
-
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
       const recognition = new SpeechRecognition();
@@ -95,8 +84,7 @@ const VoiceControl: React.FC = () => {
     addMessage({
       id: Date.now().toString(),
       role: 'ai',
-      content: initialReply,
-      timestamp: Date.now()
+      content: initialReply
     });
     // 可以在此处重新启动录音，听取用户后续问题
     setTimeout(() => {
@@ -111,32 +99,54 @@ const VoiceControl: React.FC = () => {
   const speakText = (text: string) => {
     if (!window.speechSynthesis) return;
 
-    // 清除可能卡住的语音队列
+    // 先取消当前可能卡住的语音
     window.speechSynthesis.cancel();
-
-    // 播放视频
     setPlayingVideo(true);
 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'zh-CN';
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+
+    let voices = window.speechSynthesis.getVoices();
     
-    // 尝试根据设置选择男声或女声
-    const voices = window.speechSynthesis.getVoices();
-    if (voices && voices.length > 0) {
-      const isMale = ttsVoice === 'male';
+    // 如果浏览器声音列表未加载（常见于 Chrome 刚打开时），尝试注册回调重新获取
+    if (voices.length === 0) {
+      window.speechSynthesis.onvoiceschanged = () => {
+        voices = window.speechSynthesis.getVoices();
+        setVoiceAndSpeak(utterance, voices);
+      };
+    } else {
+      setVoiceAndSpeak(utterance, voices);
+    }
+  };
 
-      let preferredVoice = voices.find(v =>
-        v.lang.includes('zh') &&
-        (isMale ? (v.name.toLowerCase().includes('male') || v.name.includes('男')) : (v.name.toLowerCase().includes('female') || v.name.includes('女')))
-      );
-
-      if (!preferredVoice) {
-        preferredVoice = voices.find(v => v.lang.includes('zh'));
+  const setVoiceAndSpeak = (utterance: SpeechSynthesisUtterance, voices: SpeechSynthesisVoice[]) => {
+    const isMale = ttsVoice === 'male';
+    
+    // 优先选择微软的高质量自然神经网络语音（Natural / Online / Xiaoxiao / Yunxi 等），这些语音极像真人
+    let preferredVoice = voices.find(v => {
+      const isZh = v.lang.includes('zh') || v.lang.includes('cmn');
+      if (!isZh) return false;
+      const name = v.name.toLowerCase();
+      
+      if (isMale) {
+        return name.includes('yunxi') || name.includes('yunjian') || name.includes('男') || name.includes('male');
+      } else {
+        // 女性优先匹配高质量人声
+        return name.includes('xiaoxiao') || name.includes('natural') || name.includes('online') || name.includes('女') || name.includes('female');
       }
+    });
 
-      if (preferredVoice) {
-        utterance.voice = preferredVoice;
-      }
+    // 如果找不到指定的高质量人声，降级为普通的中文语音
+    if (!preferredVoice) {
+      preferredVoice = voices.find(v => v.lang.includes('zh') || v.lang.includes('cmn'));
+    }
+
+    if (preferredVoice) {
+      utterance.voice = preferredVoice;
+      console.log('Selected TTS Voice:', preferredVoice.name);
     }
 
     utterance.onend = () => {
@@ -144,12 +154,17 @@ const VoiceControl: React.FC = () => {
     };
 
     utterance.onerror = (e) => {
-      console.error('SpeechSynthesis error:', e);
+      console.error('TTS Error:', e);
       setPlayingVideo(false);
     };
 
+    // 将对象挂载在全局，防止由于长文本被 Chrome 垃圾回收机制中途掐断导致无声
     (window as any)._currentUtterance = utterance;
-    window.speechSynthesis.speak(utterance);
+
+    // 加入小延迟执行 speak() 解决 Chrome PC 端的 Bug
+    setTimeout(() => {
+      window.speechSynthesis.speak(utterance);
+    }, 50);
   };
 
   /**
@@ -171,91 +186,59 @@ const VoiceControl: React.FC = () => {
     addMessage({
       id: Date.now().toString(),
       role: 'user',
-      content: msgText,
-      timestamp: Date.now()
+      content: msgText
     });
 
     try {
-      // 准备发送给后端的请求数据
-      // 如果用户选择了默认模型，不传递 apiKey，让后端使用系统环境变量或默认密钥
-      const requestData = {
-        message: msgText,
-        model_provider: modelProvider,
-        api_key: modelProvider === 'custom' ? apiKey : '', // 默认模型不再从前端传key，由后端管理
-        api_url: modelProvider === 'custom' ? customApiUrl : '',
-        custom_model_name: customModelName
-      };
-
-      // 如果在桌面客户端 (file://) 或 移动端应用 (capacitor:// / http://localhost) 中运行，则使用云端 Vercel 后端地址
-      const isDesktopOrApp = window.location.protocol === 'file:' || 
-                             window.location.protocol === 'capacitor:' || 
-                             window.location.hostname === 'localhost';
-      const apiUrl = isDesktopOrApp ? 'https://nexusvoice-2-5.vercel.app/api/chat' : '/api/chat';
-
       let replyText = "";
-      
-      // 如果用户在设置里填写了 API Key，优先走前端直连
-      if (apiKey) {
-        let directUrl = "https://api.deepseek.com/chat/completions";
-        let modelName = "deepseek-chat";
 
-        if (modelProvider === 'doubao') {
-          directUrl = "https://ark.cn-beijing.volces.com/api/v3/chat/completions";
-          modelName = "ep-20240521171539-7b9mc"; // 豆包默认接入点示例
-        } else if (modelProvider === 'custom' && customApiUrl) {
-          directUrl = customApiUrl;
-          modelName = customModelName || "default-model";
-        } else if (modelProvider === 'glm') {
-          directUrl = "https://open.bigmodel.cn/api/paas/v4/chat/completions"; 
-          modelName = "glm-4";
-        }
-
-        const directResponse = await fetch(directUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`
-          },
-          body: JSON.stringify({
-            model: modelName,
-            messages: [
-              { role: "system", content: "你是一个贴心的AI助手，请用简短、自然的中文口语回答。" },
-              { role: "user", content: msgText }
-            ]
-          })
-        });
-
-        if (!directResponse.ok) {
-          const errData = await directResponse.json().catch(() => ({}));
-          throw new Error(errData.error?.message || `API 请求失败 (状态码: ${directResponse.status})`);
-        }
-
-        const data = await directResponse.json();
-        replyText = data.choices?.[0]?.message?.content || "抱歉，我没有获取到有效的回复。";
-      } else {
-        // 否则回退到 Vercel 后端
-        const response = await fetch(apiUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(requestData)
-        });
-
-        const data = await response.json();
-
-        if (data.error) {
-          throw new Error(data.error);
-        }
-        replyText = data.reply;
+      if (!apiKey) {
+        throw new Error("${t('voice.noApiKey')}");
       }
+
+      let apiUrl = "https://api.deepseek.com/chat/completions";
+      let modelName = "deepseek-chat";
+
+      if (modelProvider === 'doubao') {
+        apiUrl = "https://ark.cn-beijing.volces.com/api/v3/chat/completions";
+        modelName = "ep-20240521171539-7b9mc"; // 豆包默认接入点示例
+      } else if (modelProvider === 'custom' && customApiUrl) {
+        apiUrl = customApiUrl;
+        modelName = "default-model";
+      } else if (modelProvider === 'xiaomi') {
+        apiUrl = "https://open.bigmodel.cn/api/paas/v4/chat/completions"; // 假设小米或智谱
+        modelName = "glm-4";
+      }
+
+      // 直接从前端调用大模型 API
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: modelName,
+          messages: [
+            { role: "system", content: "你是一个贴心的AI助手，请用简短、自然的中文口语回答。" },
+            { role: "user", content: msgText }
+          ]
+        })
+      });
+
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error?.message || `API 请求失败 (状态码: ${response.status})`);
+      }
+
+      const data = await response.json();
+      replyText = data.choices?.[0]?.message?.content || "抱歉，我没有获取到有效的回复。";
 
       // 添加AI消息到聊天面板
       addMessage({
         id: (Date.now() + 1).toString(),
         role: 'ai',
-        content: replyText,
-        timestamp: Date.now() + 1
+        content: replyText
       });
 
       // 将AI回复转为语音播报并播放视频
@@ -263,14 +246,13 @@ const VoiceControl: React.FC = () => {
 
     } catch (error: any) {
       console.error('发送消息失败:', error);
-      const errorMsg = `抱歉，发生了错误: ${error.message}`;
+      const errorMsg = `抱歉，发生错误：${error.message}`;
       addMessage({
         id: (Date.now() + 1).toString(),
         role: 'ai',
-        content: errorMsg,
-        timestamp: Date.now() + 1
+        content: errorMsg
       });
-      // 错误时也通过 TTS 播报
+      // 出错时也要语音播报错误信息
       speakText(errorMsg);
     }
   };
@@ -303,48 +285,51 @@ const VoiceControl: React.FC = () => {
   };
 
   return (
-    <div className="w-full flex items-center gap-3 p-3 lg:p-4 bg-transparent rounded-3xl">
-      {/* 录音按钮 (Morphing design) */}
+    <div className="w-full flex items-center gap-3 p-4 bg-panel border border-border shadow-panel rounded-b-panel">
+      {/* 录音按钮 */}
       <button
         onClick={toggleListening}
-        className={`relative w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center rounded-2xl sm:rounded-3xl transition-all duration-500 shadow-xl shrink-0 border group ${
-          isListening
-            ? 'bg-rose-500 text-white border-rose-400/50 shadow-rose-500/40 animate-pulse'
-            : 'bg-gradient-to-br from-blue-500 to-indigo-600 text-white border-blue-400/50 shadow-blue-500/30 hover:shadow-blue-500/50 hover:-translate-y-1'
+        className={`p-4 rounded-btn transition-all duration-300 shadow-md ${
+          isListening 
+            ? 'bg-red-500  animate-pulse shadow-red-500/50' 
+            : 'bg-base text-primary hover:bg-panel'
         }`}
         title={isListening ? "停止录音" : "开始录音"}
       >
-        {isListening ? (
-          <MicOff className="w-6 h-6 sm:w-7 sm:h-7 transition-transform group-hover:scale-110" />
-        ) : (
-          <Mic className="w-6 h-6 sm:w-7 sm:h-7 transition-transform group-hover:scale-110" />
-        )}
+        {isListening ? <MicOff size={24} /> : <Mic size={24} />}
       </button>
 
       {/* 文本输入框 */}
-      <div className="flex-1 relative group h-14 sm:h-16">
-        <input
-          type="text"
-          value={textInput}
-          onChange={(e) => setTextInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              handleSend();
-            }
-          }}
-          placeholder="Type or speak a command..."
-          className="w-full h-full pl-5 pr-14 text-[15px] bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/50 rounded-2xl sm:rounded-3xl text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all shadow-inner placeholder-slate-400 dark:placeholder-slate-500"
-        />
-        
-        {/* 内置发送按钮 */}
-        <button
-          onClick={() => handleSend()}
-          disabled={!textInput.trim()}
-          className="absolute right-2 top-2 bottom-2 w-10 sm:w-12 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-300 dark:disabled:bg-slate-700 disabled:text-slate-400 disabled:cursor-not-allowed text-white rounded-xl sm:rounded-2xl flex items-center justify-center transition-all"
-        >
-          <Send className="w-4 h-4 sm:w-5 sm:h-5 ml-1" />
-        </button>
-      </div>
+      <input
+        type="text"
+        value={textInput}
+        onChange={(e) => setTextInput(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            handleSend();
+          }
+        }}
+        placeholder="说出唤醒词或手动输入..."
+        className="flex-1 p-3 bg-base border-border border-none rounded-xl text-main focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+      />
+
+      {/* 发送按钮 */}
+      <button
+        onClick={() => handleSend()}
+        disabled={!textInput.trim()}
+        className="p-3 bg-primary hover:bg-primary-hover text-on-primary disabled:opacity-50 disabled:cursor-not-allowed  rounded-xl shadow-md transition-all"
+      >
+        <Send size={20} />
+      </button>
+
+      {/* 设置按钮 */}
+      <button
+        onClick={() => setSettingsOpen(true)}
+        className="p-3 bg-gray-100 hover:bg-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-muted rounded-xl transition-all"
+        title="系统设置"
+      >
+        <Settings size={20} />
+      </button>
     </div>
   );
 };

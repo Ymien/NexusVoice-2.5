@@ -16,14 +16,13 @@
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
-    /* Linting */
     "strict": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": false,
-    "ignoreDeprecations": "6.0",
     "noUncheckedSideEffectImports": false,
     "forceConsistentCasingInFileNames": false,
+    "ignoreDeprecations": "5.0",
     "baseUrl": "./",
     "paths": {
       "@/*": [
