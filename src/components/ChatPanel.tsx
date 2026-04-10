@@ -9,7 +9,7 @@ import { useStore } from '../store/useStore';
 const ChatPanel: React.FC = () => {
   const { t } = useI18n();
   // 获取全局聊天消息
-  const { messages } = useStore();
+  const { messages, isGenerating } = useStore();
   // 引用聊天容器底部的元素，用于实现自动滚动
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -46,6 +46,21 @@ const ChatPanel: React.FC = () => {
           ))
         )}
         {/* 这个空 div 作为滚动的锚点 */}
+        {/* 思考中动画 */}
+        {isGenerating && (
+          <div className="flex justify-start">
+            <div className="bg-panel text-main rounded-2xl rounded-bl-sm border border-border p-3 shadow-sm max-w-[80%]">
+              <div className="flex items-center space-x-2">
+                <div className="flex space-x-1">
+                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                  <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                </div>
+                <span className="text-sm font-medium text-muted">{t('app.thinking')}</span>
+              </div>
+            </div>
+          </div>
+        )}
         <div ref={messagesEndRef} />
       </div>
     </div>

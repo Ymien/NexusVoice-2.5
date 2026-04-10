@@ -34,6 +34,11 @@ interface AppState {
   setPlayingVideo: (playing: boolean) => void;        // 设置视频播放状态
   setSettingsOpen: (open: boolean) => void;           // 设置弹窗开关状态
   clearMessages: () => void;                          // 清空聊天记录
+  isGenerating: boolean;
+  setGenerating: (val: boolean) => void;
+  abortController: AbortController | null;
+  setAbortController: (ctrl: AbortController | null) => void;
+  undoLastInteraction: () => string | null;
 }
 
 // ----------------- Zustand 状态管理库实例化 -----------------
@@ -42,7 +47,7 @@ interface AppState {
 // 以防止刷新页面后丢失用户的配置信息
 export const useStore = create<AppState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       // 默认设置值
       wakeWord: '小艾',
       initialReply: '我在呢，请问有什么可以帮您？',
@@ -65,6 +70,19 @@ export const useStore = create<AppState>()(
       setPlayingVideo: (playing) => set({ isPlayingVideo: playing }),
       setSettingsOpen: (open) => set({ isSettingsOpen: open }),
       clearMessages: () => set({ messages: [] }),
+      isGenerating: false,
+      setGenerating: (val) => set({ isGenerating: val }),
+      abortController: null,
+      setAbortController: (ctrl) => set({ abortController: ctrl }),
+      undoLastInteraction: () => {
+        const msgs = get().messages;
+        if (msgs.length === 0) return null;
+        const lastUserIdx = msgs.map(m => m.role).lastIndexOf('user');
+        if (lastUserIdx === -1) return null;
+        const userMsg = msgs[lastUserIdx];
+        set({ messages: msgs.slice(0, lastUserIdx) });
+        return userMsg.content;
+      },
     }),
     {
       name: 'voice-chat-storage', // localStorage 中的键名

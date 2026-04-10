@@ -10,7 +10,11 @@ const en = {
     stopRecord: "Stop Recording",
     conversationStream: "Conversation Stream",
     clearChat: "Clear Chat",
-    readMessage: "Read Message"
+    readMessage: "Read Message",
+    thinking: "Thinking...",
+    stop: "Stop",
+    undo: "Undo",
+    edit: "Edit Input"
   },
   voice: {
     placeholder: "Type or speak a command...",
@@ -51,7 +55,11 @@ const zh = {
     stopRecord: "停止录音",
     conversationStream: "对话流 (Conversation Stream)",
     clearChat: "清空对话",
-    readMessage: "朗读消息"
+    readMessage: "朗读消息",
+    thinking: "正在思考...",
+    stop: "停止生成",
+    undo: "撤回",
+    edit: "更改输入"
   },
   voice: {
     placeholder: "输入指令或语音唤醒...",

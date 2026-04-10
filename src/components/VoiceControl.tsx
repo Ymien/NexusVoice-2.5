@@ -28,7 +28,12 @@ const VoiceControl: React.FC = () => {
     setListening,
     addMessage,
     setPlayingVideo,
-    setSettingsOpen
+    setSettingsOpen,
+    isGenerating,
+    setGenerating,
+    abortController,
+    setAbortController,
+    undoLastInteraction
   } = useStore();
 
   const [textInput, setTextInput] = useState('');
@@ -172,7 +177,7 @@ const VoiceControl: React.FC = () => {
    * @param message 用户消息
    */
   const handleSend = async (message: string = textInput) => {
-    if (!message.trim()) return;
+    if (!message.trim() || isGenerating) return;
 
     // 停止当前的语音识别（如果有）
     if (isListening && recognitionRef.current) {
@@ -188,6 +193,10 @@ const VoiceControl: React.FC = () => {
       role: 'user',
       content: msgText
     });
+
+    const ctrl = new AbortController();
+    setAbortController(ctrl);
+    setGenerating(true);
 
     try {
       let replyText = "";
@@ -223,7 +232,8 @@ const VoiceControl: React.FC = () => {
             { role: "system", content: "你是一个贴心的AI助手，请用简短、自然的中文口语回答。" },
             { role: "user", content: msgText }
           ]
-        })
+        }),
+        signal: ctrl.signal
       });
 
       if (!response.ok) {
@@ -284,8 +294,30 @@ const VoiceControl: React.FC = () => {
     }
   };
 
+
+  const handleStop = () => {
+    if (abortController) {
+      abortController.abort();
+      setGenerating(false);
+      setAbortController(null);
+    }
+  };
+
+  const handleUndo = () => {
+    undoLastInteraction();
+  };
+
+  const handleEdit = () => {
+    const content = undoLastInteraction();
+    if (content) {
+      setTextInput(content);
+    }
+  };
+
   return (
-    <div className="w-full flex items-center gap-3 p-4 bg-panel border border-border shadow-panel rounded-b-panel">
+
+    <div className="w-full flex flex-col">
+      <div className="w-full flex items-center gap-3 p-4 bg-panel border-t border-l border-r border-border shadow-panel">
       {/* 录音按钮 */}
       <button
         onClick={toggleListening}
@@ -330,6 +362,26 @@ const VoiceControl: React.FC = () => {
       >
         <Settings size={20} />
       </button>
+      {/* 操作按钮区：撤回、更改输入 */}
+      <div className="w-full flex items-center justify-end px-4 pb-3 bg-panel border-b border-l border-r border-border shadow-panel rounded-b-panel -mt-2">
+        <div className="flex space-x-3 text-xs">
+          <button 
+            onClick={handleEdit}
+            className="text-muted hover:text-primary transition-colors flex items-center gap-1"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
+            {t('app.edit')}
+          </button>
+          <button 
+            onClick={handleUndo}
+            className="text-muted hover:text-red-500 transition-colors flex items-center gap-1"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg>
+            {t('app.undo')}
+          </button>
+        </div>
+      </div>
+    </div>
     </div>
   );
 };
