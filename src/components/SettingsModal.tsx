@@ -92,7 +92,7 @@ const SettingsModal: React.FC = () => {
               >
                 <option value="deepseek">DeepSeek</option>
                 <option value="doubao">豆包 (Doubao)</option>
-                <option value="xiaomi">小米</option>
+                <option value="glm">智谱 GLM</option>
                 <option value="custom">{t("settings.customModel")}</option>
               </select>
             </div>
