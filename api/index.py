@@ -65,20 +65,20 @@ async def chat_endpoint(request: ChatRequest):
         # - VITE_GLM_API_KEY
         # - VITE_DEEPSEEK_API_KEY
         # - VITE_DOUBAO_API_KEY
-        # 允许用户在环境变量中配置自定义代理 URL，如果未配置则回退到官方地址
+        # 恢复火山引擎 (Ark) 等真实的底层模型部署节点 ID
         preset_models = {
             "glm": {
-                "name": "GLM-4.7",
-                "url": os.environ.get("VITE_GLM_API_URL", "https://open.bigmodel.cn/api/paas/v4/chat/completions"),
+                "name": "glm-4-7-251222",
+                "url": os.environ.get("VITE_GLM_API_URL", "https://ark.cn-beijing.volces.com/api/v3/chat/completions"),
                 "key": os.environ.get("VITE_GLM_API_KEY", "")
             },
             "deepseek": {
-                "name": "DeepSeek-V3.2",
-                "url": os.environ.get("VITE_DEEPSEEK_API_URL", "https://api.deepseek.com/chat/completions"),
+                "name": "ep-20260409153659-fbgz8",
+                "url": os.environ.get("VITE_DEEPSEEK_API_URL", "https://ark.cn-beijing.volces.com/api/v3/chat/completions"),
                 "key": os.environ.get("VITE_DEEPSEEK_API_KEY", "")
             },
             "doubao": {
-                "name": "Doubao-1.8",
+                "name": "ep-20260409153917-z4nx8",
                 "url": os.environ.get("VITE_DOUBAO_API_URL", "https://ark.cn-beijing.volces.com/api/v3/chat/completions"),
                 "key": os.environ.get("VITE_DOUBAO_API_KEY", "")
             }
