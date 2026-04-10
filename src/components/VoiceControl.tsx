@@ -254,7 +254,11 @@ const VoiceControl: React.FC = () => {
       // 将AI回复转为语音播报并播放视频
       speakText(replyText);
 
-    } catch (error: any) {
+        } catch (error: any) {
+      if (error.name === 'AbortError') {
+        console.log('用户中止了生成');
+        return;
+      }
       console.error('发送消息失败:', error);
       const errorMsg = `抱歉，发生错误：${error.message}`;
       addMessage({
@@ -264,6 +268,9 @@ const VoiceControl: React.FC = () => {
       });
       // 出错时也要语音播报错误信息
       speakText(errorMsg);
+    } finally {
+      setGenerating(false);
+      setAbortController(null);
     }
   };
 
@@ -345,14 +352,25 @@ const VoiceControl: React.FC = () => {
         className="flex-1 p-3 bg-base border-border border-none rounded-xl text-main focus:ring-2 focus:ring-blue-500 outline-none transition-all"
       />
 
-      {/* 发送按钮 */}
-      <button
-        onClick={() => handleSend()}
-        disabled={!textInput.trim()}
-        className="p-3 bg-primary hover:bg-primary-hover text-on-primary disabled:opacity-50 disabled:cursor-not-allowed  rounded-xl shadow-md transition-all"
-      >
-        <Send size={20} />
-      </button>
+            {/* 发送按钮 */}
+      {isGenerating ? (
+        <button
+          onClick={handleStop}
+          title={t('app.stop')}
+          className="px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl shadow-md transition-all font-medium text-sm flex items-center justify-center whitespace-nowrap"
+        >
+          {t('app.stop')}
+        </button>
+      ) : (
+        <button
+          onClick={() => handleSend()}
+          disabled={!textInput.trim()}
+          title={t('voice.send')}
+          className="p-3 bg-primary hover:bg-primary-hover text-on-primary disabled:opacity-50 disabled:cursor-not-allowed rounded-xl shadow-md transition-all"
+        >
+          <Send size={20} />
+        </button>
+      )}
 
       {/* 设置按钮 */}
       <button
