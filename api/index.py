@@ -67,22 +67,25 @@ async def chat_endpoint(request: ChatRequest):
         # - VITE_DOUBAO_API_KEY
         preset_models = {
             "glm": {
-                "name": "glm-4-7-251222",
+                "name": "glm-4-flash",
+                "url": "https://open.bigmodel.cn/api/paas/v4/chat/completions",
                 "key": os.environ.get("VITE_GLM_API_KEY", "")
             },
             "deepseek": {
-                "name": "ep-20260409153659-fbgz8",
+                "name": "deepseek-chat",
+                "url": "https://api.deepseek.com/chat/completions",
                 "key": os.environ.get("VITE_DEEPSEEK_API_KEY", "")
             },
             "doubao": {
                 "name": "ep-20260409153917-z4nx8",
+                "url": "https://ark.cn-beijing.volces.com/api/v3/chat/completions",
                 "key": os.environ.get("VITE_DOUBAO_API_KEY", "")
             }
         }
 
         # 根据不同的模型提供商设定默认的URL和模型名称
         if request.model_provider in preset_models:
-            url = url or "https://ark.cn-beijing.volces.com/api/v3/chat/completions"
+            url = url or preset_models[request.model_provider]["url"]
             model_name = preset_models[request.model_provider]["name"]
 
             # 从环境变量中读取的Key

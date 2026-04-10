@@ -16,7 +16,7 @@ declare global {
  * 功能：处理语音唤醒、录音转文字、调用后端大模型、以及文字转语音播报
  */
 const VoiceControl: React.FC = () => {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const {
     wakeWord,
     initialReply,
