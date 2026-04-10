@@ -83,22 +83,15 @@ async def chat_endpoint(request: ChatRequest):
             }
         }
 
-        # 根据不同的模型提供商设定默认的URL和模型名称
         if request.model_provider in preset_models:
-            url = url or preset_models[request.model_provider]["url"]
-            
-        # 强制修复代理 URL 格式，防止出现 All connection attempts failed (缺少 http 协议头)
-        if url and not url.startswith("http://") and not url.startswith("https://"):
-            url = "https://" + url
-            model_name = preset_models[request.model_provider]["name"]
+            cfg = preset_models[request.model_provider]
+            url = url or cfg["url"]
+            model_name = cfg["name"]
 
-            # 从环境变量中读取的Key
-            provider_key = preset_models[request.model_provider]["key"]
-            
-            # 如果环境变量有配置，优先使用环境变量；否则使用前端传来的Key
+            provider_key = cfg["key"]
             if provider_key:
                 request.api_key = provider_key
-            
+
             if not request.api_key:
                 raise HTTPException(status_code=400, detail=f"未提供 {request.model_provider} 的 API 密钥（请在前端配置或在后端设置环境变量）")
 
@@ -124,6 +117,9 @@ async def chat_endpoint(request: ChatRequest):
             }
         else:
             raise HTTPException(status_code=400, detail="不支持的模型提供商")
+
+        if url and not url.startswith("http://") and not url.startswith("https://"):
+            url = "https://" + url
 
         headers = {
             "Authorization": f"Bearer {request.api_key}",
