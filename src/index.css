@@ -100,3 +100,39 @@ body {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
+
+/* ---------------------------------------------------------
+   全局极简、优雅的滚动条样式 (Webkit) 
+   使用 CSS 变量自适应当前主题的颜色
+--------------------------------------------------------- */
+
+/* 整体滚动条宽度/高度 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+/* 滚动条滑块 */
+::-webkit-scrollbar-thumb {
+  background-color: var(--border-color);
+  border-radius: 9999px;
+  transition: background-color 0.3s ease;
+}
+
+/* 滚动条滑块（悬停状态） */
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--primary);
+}
+
+/* 滚动条轨道（透明，留白） */
+::-webkit-scrollbar-track {
+  background-color: transparent;
+  border-radius: 9999px;
+  margin: 4px;
+}
+
+/* Firefox 支持 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+}

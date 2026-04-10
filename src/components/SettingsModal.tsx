@@ -44,7 +44,7 @@ const SettingsModal: React.FC = () => {
         <h2 className="text-2xl font-bold mb-6 text-main">{t("settings.title")}</h2>
 
         {/* 滚动表单区 */}
-        <div className="flex-1 overflow-y-auto pr-2 space-y-5">
+        <div className="flex-1 overflow-y-auto pr-3 pb-2 space-y-5 scroll-smooth">
           
           {/* 界面与语言配置 */}
           <div className="space-y-3">
