@@ -64,21 +64,20 @@ async def chat_endpoint(request: ChatRequest):
         # 请在你的部署环境（如 Vercel -> Settings -> Environment Variables）中设置以下变量：
         # - VITE_GLM_API_KEY
         # - VITE_DEEPSEEK_API_KEY
-        # - VITE_DOUBAO_API_KEY
-        # 恢复火山引擎 (Ark) 等真实的底层模型部署节点 ID
+        # - VITE_DOUBAO_API_KEY        # 用户明确要求使用的底层模型版本名称
         preset_models = {
             "glm": {
-                "name": "glm-4-7-251222",
-                "url": os.environ.get("VITE_GLM_API_URL", "https://ark.cn-beijing.volces.com/api/v3/chat/completions"),
+                "name": "GLM-4.7",
+                "url": os.environ.get("VITE_GLM_API_URL", "https://open.bigmodel.cn/api/paas/v4/chat/completions"),
                 "key": os.environ.get("VITE_GLM_API_KEY", "")
             },
             "deepseek": {
-                "name": "ep-20260409153659-fbgz8",
-                "url": os.environ.get("VITE_DEEPSEEK_API_URL", "https://ark.cn-beijing.volces.com/api/v3/chat/completions"),
+                "name": "DeepSeek-V3.2",
+                "url": os.environ.get("VITE_DEEPSEEK_API_URL", "https://api.deepseek.com/chat/completions"),
                 "key": os.environ.get("VITE_DEEPSEEK_API_KEY", "")
             },
             "doubao": {
-                "name": "ep-20260409153917-z4nx8",
+                "name": "Doubao-1.8",
                 "url": os.environ.get("VITE_DOUBAO_API_URL", "https://ark.cn-beijing.volces.com/api/v3/chat/completions"),
                 "key": os.environ.get("VITE_DOUBAO_API_KEY", "")
             }
@@ -87,6 +86,10 @@ async def chat_endpoint(request: ChatRequest):
         # 根据不同的模型提供商设定默认的URL和模型名称
         if request.model_provider in preset_models:
             url = url or preset_models[request.model_provider]["url"]
+            
+        # 强制修复代理 URL 格式，防止出现 All connection attempts failed (缺少 http 协议头)
+        if url and not url.startswith("http://") and not url.startswith("https://"):
+            url = "https://" + url
             model_name = preset_models[request.model_provider]["name"]
 
             # 从环境变量中读取的Key
