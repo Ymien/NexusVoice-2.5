@@ -4,10 +4,12 @@ import VideoPlayer from '../components/VideoPlayer';
 import ChatPanel from '../components/ChatPanel';
 import VoiceControl from '../components/VoiceControl';
 import SettingsModal from '../components/SettingsModal';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, Settings } from 'lucide-react';
+import { useStore } from '../store/useStore';
 
 const Home: React.FC = () => {
   const { t } = useI18n();
+  const { setSettingsOpen } = useStore();
   return (
     <div className="h-screen w-full bg-base flex flex-col items-center justify-center p-4 md:p-6 lg:p-8 overflow-hidden">
       
@@ -22,8 +24,17 @@ const Home: React.FC = () => {
             </div>
             <h1 className="text-xl font-bold tracking-tight text-main">{t('app.title')}</h1>
           </div>
-          <div className="text-xs font-medium text-muted bg-base px-3 py-1 rounded-full border border-border">
-            v2.5.0
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:block text-xs font-medium text-muted bg-base px-3 py-1 rounded-full border border-border">
+              v2.5.0
+            </div>
+            <button 
+              onClick={() => setSettingsOpen(true)}
+              className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 text-muted hover:text-main transition-colors"
+              title={t('app.settings')}
+            >
+              <Settings size={20} />
+            </button>
           </div>
         </header>
 
