@@ -20,7 +20,9 @@ const SettingsModal: React.FC = () => {
     modelProvider,
     apiKey,
     customApiUrl,
-    setSettings
+    setSettings,
+    theme,
+    setTheme
   } = useStore();
 
   // 如果没有打开，直接不渲染
@@ -37,16 +39,50 @@ const SettingsModal: React.FC = () => {
           <X size={20} />
         </button>
 
-        <h2 className="text-2xl font-bold mb-6 text-main">系统配置</h2>
+        <h2 className="text-2xl font-bold mb-6 text-main">{t("settings.title")}</h2>
 
         {/* 滚动表单区 */}
         <div className="flex-1 overflow-y-auto pr-2 space-y-5">
-          {/* 大模型配置 */}
+          
+          {/* 界面与语言配置 */}
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-muted uppercase tracking-wider">大模型配置</h3>
+            <h3 className="text-sm font-semibold text-muted uppercase tracking-wider">{t('settings.uiConfig')}</h3>
             
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm text-main">API 提供商</label>
+              <label className="text-sm text-main">{t('settings.language')}</label>
+              <select
+                value={lang}
+                onChange={(e) => setLang(e.target.value as 'en' | 'zh')}
+                className="w-full p-2.5 rounded-lg border border-border bg-base text-main focus:ring-2 focus:ring-primary outline-none"
+              >
+                <option value="zh">简体中文</option>
+                <option value="en">English</option>
+              </select>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm text-main">UI 主题 / Theme</label>
+              <select
+                value={theme}
+                onChange={(e) => setTheme(e.target.value as any)}
+                className="w-full p-2.5 rounded-lg border border-border bg-base text-main focus:ring-2 focus:ring-primary outline-none"
+              >
+                <option value="light">{t('settings.themeLight')}</option>
+                <option value="dark">{t('settings.themeDark')}</option>
+                <option value="neon">{t('settings.themeNeon')}</option>
+                <option value="macaron">{t('settings.themeMacaron')}</option>
+                <option value="brutalist">{t('settings.themeBrutalist')}</option>
+                <option value="glass">{t('settings.themeGlass')}</option>
+              </select>
+            </div>
+          </div>
+
+          {/* 大模型配置 */}
+          <div className="space-y-3">
+            <h3 className="text-sm font-semibold text-muted uppercase tracking-wider">{t('settings.modelConfig')}</h3>
+            
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm text-main">API Provider</label>
               <select
                 value={modelProvider}
                 onChange={(e) => setSettings({ modelProvider: e.target.value })}
@@ -55,7 +91,7 @@ const SettingsModal: React.FC = () => {
                 <option value="deepseek">DeepSeek</option>
                 <option value="doubao">豆包 (Doubao)</option>
                 <option value="xiaomi">小米</option>
-                <option value="custom">自定义 API</option>
+                <option value="custom">{t("settings.customModel")}</option>
               </select>
             </div>
 
@@ -72,7 +108,7 @@ const SettingsModal: React.FC = () => {
 
             {modelProvider === 'custom' && (
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm text-main">自定义 API URL</label>
+                <label className="text-sm text-main">{t("settings.customModel")} URL</label>
                 <input
                   type="text"
                   value={customApiUrl}
@@ -88,7 +124,7 @@ const SettingsModal: React.FC = () => {
 
           {/* 语音及视频配置 */}
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-muted uppercase tracking-wider">语音与视频配置</h3>
+            <h3 className="text-sm font-semibold text-muted uppercase tracking-wider">{t("settings.voiceVideoConfig")}</h3>
 
             <div className="flex flex-col gap-1.5">
               <label className="text-sm text-main">{t('settings.wakeWord')}</label>

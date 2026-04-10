@@ -33,7 +33,8 @@ const VoiceControl: React.FC = () => {
     setGenerating,
     abortController,
     setAbortController,
-    undoLastInteraction
+    undoLastInteraction,
+    messages
   } = useStore();
 
   const [textInput, setTextInput] = useState('');
@@ -104,8 +105,11 @@ const VoiceControl: React.FC = () => {
   const speakText = (text: string) => {
     if (!window.speechSynthesis) return;
 
-    // 先取消当前可能卡住的语音
-    window.speechSynthesis.cancel();
+    // 如果当前正在播报，才取消，避免在 Chrome PC 上频繁 cancel 导致直接无声
+    if (window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+    }
+    
     setPlayingVideo(true);
 
     const utterance = new SpeechSynthesisUtterance(text);
@@ -201,37 +205,19 @@ const VoiceControl: React.FC = () => {
     try {
       let replyText = "";
 
-      if (!apiKey) {
-        throw new Error("${t('voice.noApiKey')}");
-      }
-
-      let apiUrl = "https://api.deepseek.com/chat/completions";
-      let modelName = "deepseek-chat";
-
-      if (modelProvider === 'doubao') {
-        apiUrl = "https://ark.cn-beijing.volces.com/api/v3/chat/completions";
-        modelName = "ep-20240521171539-7b9mc"; // 豆包默认接入点示例
-      } else if (modelProvider === 'custom' && customApiUrl) {
-        apiUrl = customApiUrl;
-        modelName = "default-model";
-      } else if (modelProvider === 'xiaomi') {
-        apiUrl = "https://open.bigmodel.cn/api/paas/v4/chat/completions"; // 假设小米或智谱
-        modelName = "glm-4";
-      }
-
-      // 直接从前端调用大模型 API
-      const response = await fetch(apiUrl, {
+      // 通过本地 Vercel Serverless Function 代理请求
+      // 如果本地没有配置 apiKey，后端会自动尝试使用部署环境中的环境变量（如 VITE_DEEPSEEK_API_KEY）
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: modelName,
-          messages: [
-            { role: "system", content: "你是一个贴心的AI助手，请用简短、自然的中文口语回答。" },
-            { role: "user", content: msgText }
-          ]
+          message: msgText,
+          model_provider: modelProvider,
+          api_key: apiKey || "", // 允许前端不传，由后端 fallback 读取环境变量
+          api_url: customApiUrl || "",
+          custom_model_name: ""
         }),
         signal: ctrl.signal
       });
@@ -242,7 +228,10 @@ const VoiceControl: React.FC = () => {
       }
 
       const data = await response.json();
-      replyText = data.choices?.[0]?.message?.content || "抱歉，我没有获取到有效的回复。";
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      replyText = data.reply || "抱歉，我没有获取到有效的回复。";
 
       // 添加AI消息到聊天面板
       addMessage({
@@ -323,8 +312,40 @@ const VoiceControl: React.FC = () => {
 
   return (
 
-    <div className="w-full flex flex-col">
-      <div className="w-full flex items-center gap-3 p-4 bg-panel border-t border-l border-r border-border shadow-panel">
+    <div className="w-full flex flex-col relative bg-panel border-t border-border shadow-panel">
+      {/* 动态交互动作栏 */}
+      {(messages.length > 0 || isGenerating) && (
+        <div className="flex items-center justify-center gap-3 px-4 pt-3 pb-1">
+          {isGenerating && (
+            <button
+              onClick={handleStop}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-red-500 hover:bg-red-600 rounded-full shadow-sm transition-all animate-pulse"
+            >
+              <div className="w-2 h-2 bg-white rounded-sm"></div>
+              {t('app.stop')}
+            </button>
+          )}
+          {!isGenerating && messages.length > 0 && (
+            <>
+              <button
+                onClick={handleEdit}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-main bg-base hover:bg-border border border-border rounded-full shadow-sm transition-all"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
+                {t('app.edit')}
+              </button>
+              <button
+                onClick={handleUndo}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-main bg-base hover:bg-border border border-border rounded-full shadow-sm transition-all hover:text-red-500"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg>
+                {t('app.undo')}
+              </button>
+            </>
+          )}
+        </div>
+      )}
+      <div className="w-full flex items-center gap-3 p-4">
       {/* 录音按钮 */}
       <button
         onClick={toggleListening}
@@ -353,24 +374,14 @@ const VoiceControl: React.FC = () => {
       />
 
             {/* 发送按钮 */}
-      {isGenerating ? (
-        <button
-          onClick={handleStop}
-          title={t('app.stop')}
-          className="px-4 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl shadow-md transition-all font-medium text-sm flex items-center justify-center whitespace-nowrap"
-        >
-          {t('app.stop')}
-        </button>
-      ) : (
-        <button
-          onClick={() => handleSend()}
-          disabled={!textInput.trim()}
-          title={t('voice.send')}
-          className="p-3 bg-primary hover:bg-primary-hover text-on-primary disabled:opacity-50 disabled:cursor-not-allowed rounded-xl shadow-md transition-all"
-        >
-          <Send size={20} />
-        </button>
-      )}
+      <button
+        onClick={() => handleSend()}
+        disabled={!textInput.trim() || isGenerating}
+        title={t('voice.send')}
+        className="p-3 bg-primary hover:bg-primary-hover text-on-primary disabled:opacity-50 disabled:cursor-not-allowed rounded-xl shadow-md transition-all"
+      >
+        <Send size={20} />
+      </button>
 
       {/* 设置按钮 */}
       <button
@@ -380,25 +391,6 @@ const VoiceControl: React.FC = () => {
       >
         <Settings size={20} />
       </button>
-      {/* 操作按钮区：撤回、更改输入 */}
-      <div className="w-full flex items-center justify-end px-4 pb-3 bg-panel border-b border-l border-r border-border shadow-panel rounded-b-panel -mt-2">
-        <div className="flex space-x-3 text-xs">
-          <button 
-            onClick={handleEdit}
-            className="text-muted hover:text-primary transition-colors flex items-center gap-1"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
-            {t('app.edit')}
-          </button>
-          <button 
-            onClick={handleUndo}
-            className="text-muted hover:text-red-500 transition-colors flex items-center gap-1"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 7v6h6"></path><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path></svg>
-            {t('app.undo')}
-          </button>
-        </div>
-      </div>
     </div>
     </div>
   );

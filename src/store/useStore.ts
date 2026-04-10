@@ -26,6 +26,8 @@ interface AppState {
   isListening: boolean;      // 当前是否正在录音/倾听中
   isPlayingVideo: boolean;   // 当前是否正在播放视频（即AI正在讲话时）
   isSettingsOpen: boolean;   // 设置弹窗是否打开
+  theme: 'light' | 'dark' | 'neon' | 'macaron' | 'brutalist' | 'glass';
+  setTheme: (theme: 'light' | 'dark' | 'neon' | 'macaron' | 'brutalist' | 'glass') => void;
 
   // 状态更新方法
   setSettings: (settings: Partial<AppState>) => void; // 更新设置
@@ -62,6 +64,8 @@ export const useStore = create<AppState>()(
       isListening: false,
       isPlayingVideo: false,
       isSettingsOpen: false,
+      theme: 'dark',
+      setTheme: (theme) => set({ theme }),
 
       // 状态修改实现
       setSettings: (settings) => set((state) => ({ ...state, ...settings })),
@@ -88,6 +92,7 @@ export const useStore = create<AppState>()(
       name: 'voice-chat-storage', // localStorage 中的键名
       // 仅持久化保存设置相关的字段，运行时状态（如聊天记录和正在播放状态）不保存
       partialize: (state) => ({
+        theme: state.theme,
         wakeWord: state.wakeWord,
         initialReply: state.initialReply,
         ttsVoice: state.ttsVoice,
