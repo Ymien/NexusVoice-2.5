@@ -1,82 +1,43 @@
-# NexusVoice
+# NexusVoice - Intelligent Multimodal Voice Assistant
 
-English | [简体中文](./README.md)
-
-![Version](https://img.shields.io/badge/version-v0.13.0-blue.svg)
-![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Android%20%7C%20Web-success.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
-
-> **NexusVoice** is a production-grade, multi-modal intelligent voice interaction system that provides an immersive desktop dashboard experience akin to Iron Man's "J.A.R.V.I.S.".
-> It features an incredibly smooth React + Vite frontend, connected to a powerful Serverless backend, perfectly driving and adapting to the most cutting-edge Large Language Models.
-
----
+NexusVoice is a smart terminal system integrating state-of-the-art Large Language Models with real-time voice interactions. It offers a clean, modern graphical interface, supports multimodal inputs (text, voice), and provides real-time streaming output, dedicated to delivering the most natural and fluent AI interaction experience.
 
 ## 🌟 Core Features
 
-### 🤖 Multi-Model Support & Infinite Extensibility
-- **Top-Tier Chinese LLMs**: Built-in support for GLM-4 (Zhipu), DeepSeek, Doubao, and other leading domestic models.
-- **Custom Models**: Provides completely free API configuration, supporting any proxy interface compatible with the OpenAI format or local models (like Ollama).
+- **Intelligent Voice Chat**: Features high-precision speech recognition and natural human-like Text-to-Speech (TTS), supporting real-time wake words and interruption for a smooth, "human-like" conversation.
+- **Multi-Model Support**: Easily configure and seamlessly switch between various mainstream LLMs (e.g., DeepSeek, GLM-4, Doubao) to meet performance and logical needs across different scenarios.
+- **Dynamic UI Engine**: Built-in with six deeply customized, exquisite themes (Light, Dark, Neon Cyber, Pastel Macaron, Neo Brutalism, Glassmorphism) to satisfy aesthetic preferences in any setting.
+- **Multimodal Visual Sync**: Supports linking an external video background with the AI's speaking status. Videos automatically sync during voice playback, providing intuitive visual feedback.
+- **Data Privacy & Security**: Sensitive data like API keys are processed locally in the browser and private backend, ensuring comprehensive privacy protection.
 
-### 🎙️ Lightning-Fast TTS & Visual Linkage
-- **Instant Vocalization**: Deeply optimized long-text asynchronous pronunciation mechanism across browsers and systems, thoroughly solving deadlock blockages to produce sound the moment you click.
-- **J.A.R.V.I.S. Visual Monitoring**: Features a built-in, highly sci-fi **fluid network particle video background**. When on standby or when the AI speaks, it dynamically triggers vibrant holographic halos and breathing light effects, maximizing the visual experience.
-
-### 🎨 Colorful Themes & Defense Mechanisms
-- **Theme Adaptations**: Silky-smooth switching among multiple exquisite themes including `Light`, `Dark`, `Neon Cyber`, `Pastel Macaron`, and `Sunset Horizon`.
-- **Forced Instruction Defense**: Built-in powerful system defenses intelligently block the model from generating redundant hallucinations like "randomly broadcasting the current time", ensuring pure and natural conversations.
-
----
-
-## 📦 Client Downloads (Windows & Android)
-
-**No complex code environment configuration required!**
-Please head directly to the [**Releases**](https://github.com/Ymien/NexusVoice-2.5/releases) page of this repository to download the latest installation packages:
-
-| Platform | Architecture | Filename |
-|---|---|---|
-| 💻 **Windows** | x64 | `NexusVoice Setup x.x.x.exe` |
-| 📱 **Android** | arm64/x86 | `app-debug.apk` |
-
----
-
-## 🛠️ Developer Deployment Guide (Web)
-
-If you wish to conduct secondary development locally or deploy the project as a website, please follow these steps:
+## 🚀 Quick Start
 
 ### 1. Prerequisites
-- [Node.js](https://nodejs.org/) >= 18
-- [npm](https://www.npmjs.com/) or [pnpm](https://pnpm.io/)
+- Ensure Node.js (v18+) is installed.
 
-### 2. Environment Variables Configuration
-Copy the `.env.example` in the project root directory and rename it to `.env.local`:
-```env
-VITE_GLM_API_KEY=your-glm-key
-VITE_DEEPSEEK_API_KEY=your-deepseek-key
-VITE_DOUBAO_API_KEY=your-doubao-key
-```
-
-### 3. Start Development Server
+### 2. Installation & Running
 ```bash
-git clone https://github.com/Ymien/NexusVoice-2.5.git
-cd NexusVoice-2.5
+# Install dependencies
 npm install
+
+# Start local development server
 npm run dev
 ```
 
----
+### 3. Build for Production
+```bash
+npm run build
+```
 
-## FAQ
+## 🎨 Theme Guide
 
-**Windows prompts the software is "unsigned" or "prevented from running"?**
-This project uses a completely open-source and free build process and has not purchased expensive Windows developer digital signature certificates. If intercepted by Windows SmartScreen, click "More info" -> "Run anyway".
+The system includes multiple design-language level UI themes:
+1. **Light**: Minimalist white cards with large rounded corners and soft shadows, perfect for daily office use.
+2. **Dark**: Dark background with high-contrast text to protect your eyes.
+3. **Neon Cyber**: Sharp edges, neon glowing shadows, and cyberpunk color schemes.
+4. **Pastel Macaron**: Extra-large rounded corners, soft pastel colors, and flat design.
+5. **Neo Brutalism**: Strong contrast, thick borders, and hard shadows for a striking visual impact.
+6. **Glassmorphism**: Global frosted glass effects for a premium, semi-transparent texture.
 
-**Why is there no macOS version?**
-Currently, we are focusing on optimizing the experiences for the Windows desktop and Android mobile platforms. In the future, if funding permits the purchase of an Apple Developer account, we will reconsider supporting macOS signed releases.
-
----
-
-## Changelogs
-For detailed update logs of each version, please refer to the release announcements in the [changelogs](./changelogs) folder.
-
-## License
-[MIT License](https://opensource.org/licenses/MIT) © 2026-present Ymien
+## 🛡️ Security Commitment
+This project is open-source and commits to not collecting or uploading any user API Keys or conversation data.
