@@ -82,7 +82,7 @@ const SettingsModal: React.FC = () => {
           {/* 大模型配置 */}
           <div className="space-y-3">
             <h3 className="text-sm font-semibold text-muted uppercase tracking-wider">{t('settings.modelConfig')}</h3>
-            
+
             <div className="flex flex-col gap-1.5">
               <label className="text-sm text-main">API Provider</label>
               <select
@@ -93,33 +93,61 @@ const SettingsModal: React.FC = () => {
                 <option value="deepseek">DeepSeek</option>
                 <option value="doubao">豆包 (Doubao)</option>
                 <option value="glm">智谱 GLM</option>
-                <option value="custom">{t("settings.customModel")}</option>
+                <option value="custom">{t('settings.customModel')}</option>
               </select>
             </div>
 
+            {modelProvider !== 'custom' ? (
+              <div className="p-3 bg-base border border-border rounded-lg text-sm text-muted">
+                <span className="flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"></path></svg>
+                  {t('settings.defaultKeyNote')}
+                </span>
+              </div>
+            ) : (
+              <>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm text-main">API Key</label>
+                  <input
+                    type="password"
+                    value={apiKey}
+                    onChange={(e) => setSettings({ apiKey: e.target.value })}
+                    placeholder="sk-..."
+                    className="w-full p-2.5 rounded-lg border border-border bg-base text-main focus:ring-2 focus:ring-primary outline-none"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm text-main">API URL</label>
+                  <input
+                    type="text"
+                    value={customApiUrl}
+                    onChange={(e) => setSettings({ customApiUrl: e.target.value })}
+                    placeholder="https://api.example.com/v1/chat/completions"
+                    className="w-full p-2.5 rounded-lg border border-border bg-base text-main focus:ring-2 focus:ring-primary outline-none"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm text-main">{t('settings.customModelName')}</label>
+                  <input
+                    type="text"
+                    value={customModelName}
+                    onChange={(e) => setSettings({ customModelName: e.target.value })}
+                    placeholder="gpt-4o"
+                    className="w-full p-2.5 rounded-lg border border-border bg-base text-main focus:ring-2 focus:ring-primary outline-none"
+                  />
+                </div>
+              </>
+            )}
+
             <div className="flex flex-col gap-1.5">
-              <label className="text-sm text-main">API Key</label>
-              <input
-                type="password"
-                value={apiKey}
-                onChange={(e) => setSettings({ apiKey: e.target.value })}
-                placeholder="请输入 API 密钥"
-                className="w-full p-2.5 rounded-lg border border-border bg-base text-main focus:ring-2 focus:ring-primary outline-none"
+              <label className="text-sm text-main">{t('settings.systemPrompt')}</label>
+              <textarea
+                value={systemPrompt}
+                onChange={(e) => setSettings({ systemPrompt: e.target.value })}
+                rows={3}
+                className="w-full p-2.5 rounded-lg border border-border bg-base text-main focus:ring-2 focus:ring-primary outline-none resize-none"
               />
             </div>
-
-            {modelProvider === 'custom' && (
-              <div className="flex flex-col gap-1.5">
-                <label className="text-sm text-main">{t("settings.customModel")} URL</label>
-                <input
-                  type="text"
-                  value={customApiUrl}
-                  onChange={(e) => setSettings({ customApiUrl: e.target.value })}
-                  placeholder="例如: https://your-custom-api.com/v1/chat/completions"
-                  className="w-full p-2.5 rounded-lg border border-border bg-base text-main focus:ring-2 focus:ring-primary outline-none"
-                />
-              </div>
-            )}
           </div>
 
           <hr className="border-border" />
