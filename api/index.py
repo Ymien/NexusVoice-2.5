@@ -65,20 +65,21 @@ async def chat_endpoint(request: ChatRequest):
         # - VITE_GLM_API_KEY
         # - VITE_DEEPSEEK_API_KEY
         # - VITE_DOUBAO_API_KEY        # 用户明确要求使用的底层模型版本名称
+        # 采用用户提供的火山引擎真实部署端点名称和响应URL
         preset_models = {
             "glm": {
-                "name": "GLM-4.7",
-                "url": os.environ.get("VITE_GLM_API_URL", "https://open.bigmodel.cn/api/paas/v4/chat/completions"),
+                "name": "glm-4-7-251222",
+                "url": os.environ.get("VITE_GLM_API_URL", "https://ark.cn-beijing.volces.com/api/v3/responses"),
                 "key": os.environ.get("VITE_GLM_API_KEY", "")
             },
             "deepseek": {
-                "name": "DeepSeek-V3.2",
-                "url": os.environ.get("VITE_DEEPSEEK_API_URL", "https://api.deepseek.com/chat/completions"),
+                "name": "ep-20260409153659-fbgz8",
+                "url": os.environ.get("VITE_DEEPSEEK_API_URL", "https://ark.cn-beijing.volces.com/api/v3/responses"),
                 "key": os.environ.get("VITE_DEEPSEEK_API_KEY", "")
             },
             "doubao": {
-                "name": "Doubao-1.8",
-                "url": os.environ.get("VITE_DOUBAO_API_URL", "https://ark.cn-beijing.volces.com/api/v3/chat/completions"),
+                "name": "ep-20260409153917-z4nx8",
+                "url": os.environ.get("VITE_DOUBAO_API_URL", "https://ark.cn-beijing.volces.com/api/v3/responses"),
                 "key": os.environ.get("VITE_DOUBAO_API_KEY", "")
             }
         }
@@ -96,13 +97,36 @@ async def chat_endpoint(request: ChatRequest):
                 raise HTTPException(status_code=400, detail=f"未提供 {request.model_provider} 的 API 密钥（请在前端配置或在后端设置环境变量）")
 
             sys_prompt = request.system_prompt if request.system_prompt else "你是一个智能语音助手。请用简短、口语化、亲切的语言回答。"
-            payload = {
-                "model": model_name,
-                "messages": [
-                    {"role": "system", "content": sys_prompt},
-                    {"role": "user", "content": request.message}
-                ]
-            }
+            
+            # 判断是否是火山引擎的特殊 `api/v3/responses` 接口
+            if "ark.cn-beijing.volces.com/api/v3/responses" in url:
+                payload = {
+                    "model": model_name,
+                    "stream": False, # 如果需要流式这里先设为False以保证接口返回全量JSON
+                    "input": [
+                        {
+                            "role": "system",
+                            "content": [
+                                {"type": "input_text", "text": sys_prompt}
+                            ]
+                        },
+                        {
+                            "role": "user",
+                            "content": [
+                                {"type": "input_text", "text": request.message}
+                            ]
+                        }
+                    ]
+                }
+            else:
+                # 兼容标准 OpenAI 格式
+                payload = {
+                    "model": model_name,
+                    "messages": [
+                        {"role": "system", "content": sys_prompt},
+                        {"role": "user", "content": request.message}
+                    ]
+                }
         elif request.model_provider == "custom":
             if not url:
                 raise HTTPException(status_code=400, detail="自定义模型必须提供 api_url")
@@ -136,8 +160,24 @@ async def chat_endpoint(request: ChatRequest):
 
             data = response.json()
             
-            # 由于统一改用了标准的 chat/completions 接口，所有的回复文本提取逻辑都可以统一为标准格式
-            reply_text = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+            # 兼容火山引擎 responses 接口与标准 chat/completions 接口的文本提取
+            if "ark.cn-beijing.volces.com/api/v3/responses" in url:
+                # 火山 responses 格式通常为: data["output"]["content"][0]["text"] 或者 data["output"]["text"] 
+                # 根据官方文档，如果返回是标准 openai 格式，也做兼容处理
+                try:
+                    output = data.get("output", {})
+                    content_list = output.get("content", [])
+                    if len(content_list) > 0 and "text" in content_list[0]:
+                        reply_text = content_list[0]["text"]
+                    elif "text" in output:
+                        reply_text = output["text"]
+                    else:
+                        # Fallback for chat/completions mapping inside Ark
+                        reply_text = data.get("choices", [{}])[0].get("message", {}).get("content", "")
+                except Exception:
+                    reply_text = ""
+            else:
+                reply_text = data.get("choices", [{}])[0].get("message", {}).get("content", "")
 
             if not reply_text:
                 return ChatResponse(reply="", error="模型返回的数据格式无法解析内容: " + str(data))
