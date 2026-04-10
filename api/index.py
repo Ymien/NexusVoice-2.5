@@ -162,19 +162,33 @@ async def chat_endpoint(request: ChatRequest):
             
             # 兼容火山引擎 responses 接口与标准 chat/completions 接口的文本提取
             if "ark.cn-beijing.volces.com/api/v3/responses" in url:
-                # 火山 responses 格式通常为: data["output"]["content"][0]["text"] 或者 data["output"]["text"] 
-                # 根据官方文档，如果返回是标准 openai 格式，也做兼容处理
+                # 根据最新的火山引擎真实响应结构:
+                # 'output' 是一个列表 (list), 例如:
+                # 'output': [{'type': 'reasoning', ...}, {'type': 'message', 'role': 'assistant', 'content': [{'type': 'output_text', 'text': '...'}]}]
                 try:
-                    output = data.get("output", {})
-                    content_list = output.get("content", [])
-                    if len(content_list) > 0 and "text" in content_list[0]:
-                        reply_text = content_list[0]["text"]
-                    elif "text" in output:
-                        reply_text = output["text"]
-                    else:
-                        # Fallback for chat/completions mapping inside Ark
-                        reply_text = data.get("choices", [{}])[0].get("message", {}).get("content", "")
-                except Exception:
+                    output_list = data.get("output", [])
+                    reply_text = ""
+                    
+                    if isinstance(output_list, list):
+                        # 遍历 output 列表，寻找 type == "message" 且 role == "assistant" 的块
+                        for item in output_list:
+                            if item.get("type") == "message" and item.get("role") == "assistant":
+                                content_list = item.get("content", [])
+                                # content 也是一个列表，找出 type == "output_text" 的 text
+                                for content_item in content_list:
+                                    if content_item.get("type") == "output_text" and "text" in content_item:
+                                        reply_text += content_item["text"]
+                                        
+                    # Fallback dictionary check
+                    elif isinstance(output_list, dict):
+                        content_list = output_list.get("content", [])
+                        if len(content_list) > 0 and "text" in content_list[0]:
+                            reply_text = content_list[0]["text"]
+                        elif "text" in output_list:
+                            reply_text = output_list["text"]
+                            
+                except Exception as e:
+                    print("Parse error:", e)
                     reply_text = ""
             else:
                 reply_text = data.get("choices", [{}])[0].get("message", {}).get("content", "")
