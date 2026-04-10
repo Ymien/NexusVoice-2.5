@@ -30,7 +30,6 @@ const VoiceControl: React.FC = () => {
     setListening,
     addMessage,
     setPlayingVideo,
-    setSettingsOpen,
     isGenerating,
     setGenerating,
     abortController,
@@ -175,6 +174,23 @@ const VoiceControl: React.FC = () => {
     // 加入小延迟执行 speak() 解决 Chrome PC 端的 Bug
     setTimeout(() => {
       window.speechSynthesis.speak(utterance);
+      
+      // Chrome 垃圾回收导致的 TTS 中断 Bug 的终极修复方案
+      // 定期唤醒引擎直到播报结束
+      const resumeInfinity = () => {
+        if (!window.speechSynthesis.speaking) {
+          clearInterval(intervalId);
+          return;
+        }
+        window.speechSynthesis.pause();
+        window.speechSynthesis.resume();
+      };
+      const intervalId = setInterval(resumeInfinity, 5000);
+      
+      // 当播报彻底结束或出错时，清除定时器
+      const cleanup = () => clearInterval(intervalId);
+      utterance.addEventListener('end', cleanup);
+      utterance.addEventListener('error', cleanup);
     }, 50);
   };
 
@@ -384,15 +400,6 @@ const VoiceControl: React.FC = () => {
         className="p-3 bg-primary hover:bg-primary-hover text-on-primary disabled:opacity-50 disabled:cursor-not-allowed rounded-xl shadow-md transition-all"
       >
         <Send size={20} />
-      </button>
-
-      {/* 设置按钮 */}
-      <button
-        onClick={() => setSettingsOpen(true)}
-        className="p-3 bg-gray-100 hover:bg-gray-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-muted rounded-xl transition-all"
-        title="系统设置"
-      >
-        <Settings size={20} />
       </button>
     </div>
     </div>

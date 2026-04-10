@@ -90,9 +90,9 @@ const SettingsModal: React.FC = () => {
                 onChange={(e) => setSettings({ modelProvider: e.target.value })}
                 className="w-full p-2.5 rounded-lg border border-border bg-base text-main focus:ring-2 focus:ring-primary outline-none"
               >
-                <option value="deepseek">DeepSeek (默认配置 / Default)</option>
-                <option value="doubao">豆包 Doubao (默认配置 / Default)</option>
-                <option value="glm">智谱 GLM (默认配置 / Default)</option>
+                <option value="deepseek">{t('settings.deepseekDefault')}</option>
+                <option value="doubao">{t('settings.doubaoDefault')}</option>
+                <option value="glm">{t('settings.glmDefault')}</option>
                 <option value="custom">{t('settings.customModel')}</option>
               </select>
             </div>
