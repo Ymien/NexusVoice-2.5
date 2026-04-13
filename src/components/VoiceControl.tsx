@@ -1,7 +1,7 @@
 import { useI18n } from '../store/useI18n';
 import React, { useState, useEffect, useRef } from 'react';
 import { useStore } from '../store/useStore';
-import { Mic, MicOff, Settings, Send } from 'lucide-react';
+import { Mic, MicOff, Send } from 'lucide-react';
 
 // 声明全局变量，防止 TS 报错，因为不是所有浏览器都有 webkitSpeechRecognition
 declare global {
