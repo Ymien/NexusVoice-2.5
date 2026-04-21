@@ -1,65 +1,62 @@
-// ABOUTME: Express server with Vite integration
-// ABOUTME: Handles API routes and serves frontend in dev/prod modes
+// ABOUTME: Express API server
+// ABOUTME: Handles API routes and serves static files in production
 
-import { createServer, type Server } from 'http';
 import express from 'express';
+import path from 'path';
+import fs from 'fs';
 import router from './routes/index';
-import { setupVite } from './vite';
 
 const isDev = process.env.COZE_PROJECT_ENV !== 'PROD';
-const port = parseInt(process.env.PORT || '5000', 10);
-const hostname = process.env.HOSTNAME || 'localhost';
+const port = parseInt(process.env.PORT || (isDev ? '3001' : '5000'), 10);
 const app = express();
-// 使用 http.createServer 包装 Express app，以便支持 WebSocket 等协议升级
-const server = createServer(app);
 
-async function startServer(): Promise<Server> {
-  // 请求日志（仅开发环境）
-  if (isDev) {
-    app.use((req, res, next) => {
-      const start = Date.now();
-      res.on('finish', () => {
-        const ms = Date.now() - start;
-        console.log(`${req.method} ${req.url} - ${ms}ms`);
-      });
-      next();
-    });
-  }
+// 请求体解析
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-  // 添加请求体解析
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
-
-  // 注册 API 路由
-  app.use(router);
-
-  // 集成 Vite（开发模式）或静态文件服务（生产模式）
-  await setupVite(app);
-
-  // 全局错误处理
-  app.use((err: Error, req: express.Request, res: express.Response) => {
-    console.error('Server error:', err);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const status = 'status' in err ? (err as any).status || 500 : 500;
-    res.status(status).json({
-      error: err.message || 'Internal server error',
-    });
+// CORS for dev proxy
+if (isDev) {
+  app.use((_req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    if (_req.method === 'OPTIONS') {
+      res.sendStatus(204);
+      return;
+    }
+    next();
   });
-
-  server.once('error', err => {
-    console.error('Server error:', err);
-    process.exit(1);
-  });
-
-  server.listen(port, () => {
-    console.log(`\n✨ Server running at http://${hostname}:${port}`);
-    console.log(`📝 Environment: ${isDev ? 'development' : 'production'}\n`);
-  });
-
-  return server;
 }
 
-startServer().catch(err => {
-  console.error('Failed to start server:', err);
-  process.exit(1);
+// 注册 API 路由
+app.use(router);
+
+// 生产环境: 服务静态文件
+if (!isDev) {
+  const distPath = path.resolve(process.cwd(), 'dist');
+  if (fs.existsSync(distPath)) {
+    app.use(express.static(distPath));
+    // SPA fallback
+    app.use((_req, res) => {
+      res.sendFile(path.join(distPath, 'index.html'));
+    });
+    console.log('Serving static files from dist/');
+  } else {
+    console.error('dist/ folder not found. Run "pnpm build" first.');
+  }
+}
+
+// 全局错误处理
+app.use((err: Error, _req: express.Request, res: express.Response) => {
+  console.error('Server error:', err);
+  const status = 'status' in err ? (err as { status?: number }).status || 500 : 500;
+  res.status(status).json({
+    error: err.message || 'Internal server error',
+  });
 });
+
+const server = app.listen(port, () => {
+  console.log(`Server running on port ${port} (${isDev ? 'development' : 'production'})`);
+});
+
+export { app, server };

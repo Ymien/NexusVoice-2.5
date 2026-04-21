@@ -1,7 +1,8 @@
 {
   "name": "projects",
+  "type": "module",
   "version": "1.0.0",
-  "description": "Vanilla TypeScript application with Express + Vite (HTML + CSS + TS + Node API)",
+  "description": "NexusVoice - Next Generation Voice AI Interface",
   "scripts": {
     "build": "bash ./scripts/build.sh",
     "dev": "bash ./scripts/dev.sh",
@@ -12,14 +13,23 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "2.95.3",
+    "clsx": "^2.1.1",
     "dotenv": "^17.2.3",
-    "express": "^4.21.2"
+    "express": "^4.21.2",
+    "lucide-react": "^1.8.0",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "tailwind-merge": "^3.5.0",
+    "zustand": "^5.0.12"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.5",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.2.0",
     "autoprefixer": "^10.4.20",
-    "coze-coding-dev-sdk": "^0.7.16",
+    "coze-coding-dev-sdk": "^0.7.20",
     "esbuild": "^0.24.2",
     "eslint": "^9",
     "only-allow": "^1.2.2",
@@ -29,7 +39,8 @@
     "tsx": "^4.19.2",
     "typescript": "^5.6.0",
     "typescript-eslint": "^8",
-    "vite": "^7.2.4"
+    "vite": "^5.4.21",
+    "vite-tsconfig-paths": "^6.1.1"
   },
   "packageManager": "pnpm@9.0.0",
   "engines": {
